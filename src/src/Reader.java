@@ -1,13 +1,20 @@
+import java.util.UUID;
+
 public class Reader implements User {
     private String name;
+    private UUID id;
 
-    public Reader(String name) {
+    public Reader(UUID id, String name) {
+        this.id = id;
         this.name = name;
     }
 
     @Override
     public String getName() {
         return name;
+    }
+    public UUID getId() {
+        return id;
     }
 
     @Override

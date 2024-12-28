@@ -1,0 +1,101 @@
+id,title,author,year,availableCopies
+1,The Great Adventure,John Smith,1995,5
+2,Mystery of the Night,Jane Doe,2000,3
+3,Journey to the Stars,Emily Johnson,2015,8
+4,The Lost Kingdom,Michael Brown,2010,4
+5,Echoes of Eternity,Sarah Davis,2020,12
+6,Whispers of the Past,Robert Wilson,2018,7
+7,Shadows of Tomorrow,Laura Garcia,1998,10
+8,Tales of the Brave,David Martinez,2017,2
+9,Legends of the Sea,Emma Anderson,2019,15
+10,Dreams of the Future,Daniel Thomas,2021,6
+11,The Great Adventure,John Smith,1995,5
+12,Mystery of the Night,Jane Doe,2000,3
+13,Journey to the Stars,Emily Johnson,2015,8
+14,The Lost Kingdom,Michael Brown,2010,4
+15,Echoes of Eternity,Sarah Davis,2020,12
+16,Whispers of the Past,Robert Wilson,2018,7
+17,Shadows of Tomorrow,Laura Garcia,1998,10
+18,Tales of the Brave,David Martinez,2017,2
+19,Legends of the Sea,Emma Anderson,2019,15
+20,Dreams of the Future,Daniel Thomas,2021,6
+21,The Great Adventure,John Smith,1995,5
+22,Mystery of the Night,Jane Doe,2000,3
+23,Journey to the Stars,Emily Johnson,2015,8
+24,The Lost Kingdom,Michael Brown,2010,4
+25,Echoes of Eternity,Sarah Davis,2020,12
+26,Whispers of the Past,Robert Wilson,2018,7
+27,Shadows of Tomorrow,Laura Garcia,1998,10
+28,Tales of the Brave,David Martinez,2017,2
+29,Legends of the Sea,Emma Anderson,2019,15
+30,Dreams of the Future,Daniel Thomas,2021,6
+31,The Great Adventure,John Smith,1995,5
+32,Mystery of the Night,Jane Doe,2000,3
+33,Journey to the Stars,Emily Johnson,2015,8
+34,The Lost Kingdom,Michael Brown,2010,4
+35,Echoes of Eternity,Sarah Davis,2020,12
+36,Whispers of the Past,Robert Wilson,2018,7
+37,Shadows of Tomorrow,Laura Garcia,1998,10
+38,Tales of the Brave,David Martinez,2017,2
+39,Legends of the Sea,Emma Anderson,2019,15
+40,Dreams of the Future,Daniel Thomas,2021,6
+41,The Great Adventure,John Smith,1995,5
+42,Mystery of the Night,Jane Doe,2000,3
+43,Journey to the Stars,Emily Johnson,2015,8
+44,The Lost Kingdom,Michael Brown,2010,4
+45,Echoes of Eternity,Sarah Davis,2020,12
+46,Whispers of the Past,Robert Wilson,2018,7
+47,Shadows of Tomorrow,Laura Garcia,1998,10
+48,Tales of the Brave,David Martinez,2017,2
+49,Legends of the Sea,Emma Anderson,2019,15
+50,Dreams of the Future,Daniel Thomas,2021,6
+51,The Great Adventure,John Smith,1995,5
+52,Mystery of the Night,Jane Doe,2000,3
+53,Journey to the Stars,Emily Johnson,2015,8
+54,The Lost Kingdom,Michael Brown,2010,4
+55,Echoes of Eternity,Sarah Davis,2020,12
+56,Whispers of the Past,Robert Wilson,2018,7
+57,Shadows of Tomorrow,Laura Garcia,1998,10
+58,Tales of the Brave,David Martinez,2017,2
+59,Legends of the Sea,Emma Anderson,2019,15
+60,Dreams of the Future,Daniel Thomas,2021,6
+61,The Great Adventure,John Smith,1995,5
+62,Mystery of the Night,Jane Doe,2000,3
+63,Journey to the Stars,Emily Johnson,2015,8
+64,The Lost Kingdom,Michael Brown,2010,4
+65,Echoes of Eternity,Sarah Davis,2020,12
+66,Whispers of the Past,Robert Wilson,2018,7
+67,Shadows of Tomorrow,Laura Garcia,1998,10
+68,Tales of the Brave,David Martinez,2017,2
+69,Legends of the Sea,Emma Anderson,2019,15
+70,Dreams of the Future,Daniel Thomas,2021,6
+71,The Great Adventure,John Smith,1995,5
+72,Mystery of the Night,Jane Doe,2000,3
+73,Journey to the Stars,Emily Johnson,2015,8
+74,The Lost Kingdom,Michael Brown,2010,4
+75,Echoes of Eternity,Sarah Davis,2020,12
+76,Whispers of the Past,Robert Wilson,2018,7
+77,Shadows of Tomorrow,Laura Garcia,1998,10
+78,Tales of the Brave,David Martinez,2017,2
+79,Legends of the Sea,Emma Anderson,2019,15
+80,Dreams of the Future,Daniel Thomas,2021,6
+81,The Great Adventure,John Smith,1995,5
+82,Mystery of the Night,Jane Doe,2000,3
+83,Journey to the Stars,Emily Johnson,2015,8
+84,The Lost Kingdom,Michael Brown,2010,4
+85,Echoes of Eternity,Sarah Davis,2020,12
+86,Whispers of the Past,Robert Wilson,2018,7
+87,Shadows of Tomorrow,Laura Garcia,1998,10
+88,Tales of the Brave,David Martinez,2017,2
+89,Legends of the Sea,Emma Anderson,2019,15
+90,Dreams of the Future,Daniel Thomas,2021,6
+91,The Great Adventure,John Smith,1995,5
+92,Mystery of the Night,Jane Doe,2000,3
+93,Journey to the Stars,Emily Johnson,2015,8
+94,The Lost Kingdom,Michael Brown,2010,4
+95,Echoes of Eternity,Sarah Davis,2020,12
+96,Whispers of the Past,Robert Wilson,2018,7
+97,Shadows of Tomorrow,Laura Garcia,1998,10
+98,Tales of the Brave,David Martinez,2017,2
+99,Legends of the Sea,Emma Anderson,2019,15
+100,Dreams of the Future,Daniel Thomas,2021,6

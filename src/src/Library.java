@@ -6,11 +6,14 @@ public class Library {
     private List<Book> books;
     private List<User> users;
     private List<Loan> loans;
-
+    private List<Reader> readers;
     public Library() {
         books = new ArrayList<>();
         users = new ArrayList<>();
         loans = new ArrayList<>();
+        readers = new ArrayList<>();
+        loadUsersData();
+        loadData();
     }
 
     // Dodanie książki do biblioteki
@@ -26,8 +29,19 @@ public class Library {
     // Dodanie użytkownika
     public void registerUser(User user) {
         users.add(user);
+        saveUser(user);
     }
+    public void saveUser(User user) {
+        String filePath = "users.txt";
+        String newLine = UUID.randomUUID() + "," + user.getName() + ",reader";
 
+        try (FileWriter writer = new FileWriter(filePath, true)) {
+            writer.write(newLine + System.lineSeparator());
+        } catch (IOException e) {
+            System.out.println("Error while saving user.");
+            e.printStackTrace();
+        }
+    }
     // Wypożyczenie książki
     public void borrowBook(Reader reader, Book book) {
         if (book.getAvailableCopies() > 0) {
@@ -62,10 +76,21 @@ public class Library {
         return foundBooks;
     }
 
-    // Wyświetlanie książek
     public void listBooks() {
-        for (Book book : books) {
-            System.out.println(book);
+        System.out.println("Books in library:");
+
+        System.out.printf("| %-3s | %-30s | %-25s | %-4s | %-3s |%n", "ID", "Title", "Author", "Year", "Stock");
+        System.out.println("|-----|--------------------------------|---------------------------|------|-----|");
+
+        for (int i = 0; i < books.size(); i++) {
+            Book book = books.get(i);
+
+            System.out.printf("| %-3d | %-30s | %-25s | %-4d | %-3d |%n",
+                    i+1,
+                    book.getTitle(),
+                    book.getAuthor(),
+                    book.getYear(),
+                    book.getAvailableCopies());
         }
     }
 
@@ -78,11 +103,11 @@ public class Library {
 
     // Zapis danych do pliku
     public void saveData() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("library_data.txt"))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("books.txt"))) {
             for (Book book : books) {
                 writer.write(book.getTitle() + "," + book.getAuthor() + "," + book.getYear() + "," + book.getAvailableCopies() + "\n");
             }
-            System.out.println("Data saved to library_data.txt");
+            System.out.println("Data saved to books.txt");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -90,18 +115,68 @@ public class Library {
 
     // Wczytanie danych z pliku
     public void loadData() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("library_data.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("books.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
+                if (line.startsWith("id")) continue;
+
                 String[] parts = line.split(",");
-                String title = parts[0];
-                String author = parts[1];
-                int year = Integer.parseInt(parts[2]);
-                int availableCopies = Integer.parseInt(parts[3]);
-                addBook(new Book(title, author, year, availableCopies));
+                //TODO: wspolna obsluga bledow
+                if (parts.length < 5) {
+                    System.out.println("Error in line: " + line);
+                    continue;
+                }
+
+                String title = parts[1].trim();
+                String author = parts[2].trim();
+                int year = 0;
+                int availableCopies = 0;
+
+                try {
+                    year = Integer.parseInt(parts[3].trim());
+                } catch (NumberFormatException e) {
+                    System.out.println("Error year " + parts[3]);
+                    continue;
+                }
+
+
+                try {
+                    availableCopies = Integer.parseInt(parts[4].trim());
+                } catch (NumberFormatException e) {
+                    System.out.println("Error copies: " + parts[4]);
+                    continue;
+                }
+                addBook(new Book(UUID.randomUUID(), title, author, year, availableCopies));
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+        public void loadUsersData() {
+            try (BufferedReader reader = new BufferedReader(new FileReader("users.txt"))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    if (line.startsWith("id")) continue;
+
+                    String[] parts = line.split(",");
+
+                    UUID id = UUID.fromString(parts[0].trim());
+                    String name = parts[1].trim();
+
+                    users.add(new Reader(id, name));
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+    }
+    public List<Reader> searchUser(String name) {
+        List<Reader> foundUser = new ArrayList<>();
+        for (Reader reader : readers) {
+            if (reader.getName().contains(name) ) {
+                foundUser.add(reader);
+            }
+        }
+        return foundUser;
     }
 }
