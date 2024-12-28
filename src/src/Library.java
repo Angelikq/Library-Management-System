@@ -6,11 +6,14 @@ public class Library {
     private List<Book> books;
     private List<User> users;
     private List<Loan> loans;
-
+    private List<Reader> readers;
     public Library() {
         books = new ArrayList<>();
         users = new ArrayList<>();
         loans = new ArrayList<>();
+        readers = new ArrayList<>();
+        loadUsersData();
+        loadData();
     }
 
     // Dodanie książki do biblioteki
@@ -26,8 +29,19 @@ public class Library {
     // Dodanie użytkownika
     public void registerUser(User user) {
         users.add(user);
+        saveUser(user);
     }
+    public void saveUser(User user) {
+        String filePath = "users.txt";
+        String newLine = UUID.randomUUID() + "," + user.getName() + ",reader";
 
+        try (FileWriter writer = new FileWriter(filePath, true)) {
+            writer.write(newLine + System.lineSeparator());
+        } catch (IOException e) {
+            System.out.println("Error while saving user.");
+            e.printStackTrace();
+        }
+    }
     // Wypożyczenie książki
     public void borrowBook(Reader reader, Book book) {
         if (book.getAvailableCopies() > 0) {
@@ -132,10 +146,37 @@ public class Library {
                     System.out.println("Error copies: " + parts[4]);
                     continue;
                 }
-                addBook(new Book(title, author, year, availableCopies));
+                addBook(new Book(UUID.randomUUID(), title, author, year, availableCopies));
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+        public void loadUsersData() {
+            try (BufferedReader reader = new BufferedReader(new FileReader("users.txt"))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    if (line.startsWith("id")) continue;
+
+                    String[] parts = line.split(",");
+
+                    UUID id = UUID.fromString(parts[0].trim());
+                    String name = parts[1].trim();
+
+                    users.add(new Reader(id, name));
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+    }
+    public List<Reader> searchUser(String name) {
+        List<Reader> foundUser = new ArrayList<>();
+        for (Reader reader : readers) {
+            if (reader.getName().contains(name) ) {
+                foundUser.add(reader);
+            }
+        }
+        return foundUser;
     }
 }
