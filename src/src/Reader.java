@@ -2,10 +2,10 @@ import java.util.UUID;
 
 public class Reader implements User {
     private String name;
-    private UUID id;
+    private String cardNo;
 
-    public Reader(UUID id, String name) {
-        this.id = id;
+    public Reader(String cardNo, String name) {
+        this.cardNo = cardNo;
         this.name = name;
     }
 
@@ -13,8 +13,8 @@ public class Reader implements User {
     public String getName() {
         return name;
     }
-    public UUID getId() {
-        return id;
+    public String getCardNo() {
+        return cardNo;
     }
 
     @Override

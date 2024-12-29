@@ -19,6 +19,7 @@ public class Library {
     // Dodanie książki do biblioteki
     public void addBook(Book book) {
         books.add(book);
+        saveData();
     }
 
     // Usuwanie książki
@@ -27,13 +28,13 @@ public class Library {
     }
 
     // Dodanie użytkownika
-    public void registerUser(User user) {
-        users.add(user);
-        saveUser(user);
+    public void registerUser(Reader reader) {
+        users.add(reader);
+        saveUser(reader);
     }
-    public void saveUser(User user) {
+    public void saveUser(Reader reader) {
         String filePath = "users.txt";
-        String newLine = UUID.randomUUID() + "," + user.getName() + ",reader";
+        String newLine = reader.getCardNo() + "," + reader.getName() + ",reader";
 
         try (FileWriter writer = new FileWriter(filePath, true)) {
             writer.write(newLine + System.lineSeparator());
@@ -105,7 +106,7 @@ public class Library {
     public void saveData() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("books.txt"))) {
             for (Book book : books) {
-                writer.write(book.getTitle() + "," + book.getAuthor() + "," + book.getYear() + "," + book.getAvailableCopies() + "\n");
+                writer.write( book.getId() + "," + book.getTitle() + "," + book.getAuthor() + "," + book.getYear() + "," + book.getAvailableCopies() + "\n");
             }
             System.out.println("Data saved to books.txt");
         } catch (IOException e) {
@@ -160,23 +161,30 @@ public class Library {
 
                     String[] parts = line.split(",");
 
-                    UUID id = UUID.fromString(parts[0].trim());
+                    String cardNo = parts[0].trim();
                     String name = parts[1].trim();
 
-                    users.add(new Reader(id, name));
+                    readers.add(new Reader(cardNo, name));
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
     }
-    public List<Reader> searchUser(String name) {
+    public List<Reader> searchUser(String cardNo) {
+        while (cardNo.length() < 6) {
+            cardNo = "0" + cardNo;
+        }
         List<Reader> foundUser = new ArrayList<>();
         for (Reader reader : readers) {
-            if (reader.getName().contains(name) ) {
+            if (reader.getCardNo().contains(cardNo) ) {
                 foundUser.add(reader);
             }
         }
         return foundUser;
+    }
+    public String getNewCardNo(){
+        int nextNumber = readers.size() + 1;
+        return String.format("%06d", nextNumber);
     }
 }
