@@ -1,48 +1,36 @@
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 import java.util.UUID;
 
 public class Main {
-
+    static Scanner scanner = new Scanner(System.in);
+    static Library library = new Library();
+    static Reader currentReader = null;
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
 
-        Library library = new Library();
-        Reader currentReader = null;
+
         System.out.print("Welcome to library system!\nIf you are user write 'u' if you are librarian write 'l': ");
         char mode = scanner.next().charAt(0);
         if(mode == 'u') {
             System.out.print("Are you an registered reader? (Write y for 'yes'): ");
-            char yes = scanner.next().charAt(0);
-            if(yes == 'y') {
-                System.out.println("Please, write your name: ");
+            boolean isRegistered = scanner.next().charAt(0) == 'y';
+            if(isRegistered) {
+                System.out.println("Please, write your cardNo ");
                 scanner.nextLine();
-                String name = scanner.nextLine();
-                List<Reader> foundedUsers = library.searchUser(name);
+                String cardNo = scanner.nextLine();
+                List<Reader> foundedUsers = library.searchUser(cardNo);
                 if(foundedUsers.size() == 1) {
-                    //TODO: names is not unique
-                    System.out.println("Hello, " + name + "! What we can do for you today?");
                     currentReader = foundedUsers.getFirst();
+                    System.out.println("Hello, " + currentReader.getName() + "! What we can do for you today?");
+                } else if (foundedUsers.size() > 1) {
+                    //TODO: Error
                 }else{
-                    System.out.println("You are not registered user.");
-                    registerReader(scanner, library, currentReader);
+                    System.out.println("We don't have this card in our system");
+                    registerReader();
                 }
             }else{
-                System.out.print("Do you want to be registered? (Write y for 'yes'): ");
-                char wantToRegister = scanner.next().charAt(0);
-                if(wantToRegister == 'y') {
-                    registerReader(scanner, library, currentReader);
-                }else{
-                    System.out.print("You are not register user, but if u want u can see what books we have.\n Write 'books' to see our offer or 'q' to quit");
-                    String answer = scanner.next();
-                    if(answer.equals("q")) {
-                        System.out.println("Goodbye!");
-                        return;
-                    } else if (answer.equals("books")) {
-                        library.listBooks();
-                    }
-
-                }
+                registerReader();
             }
                 while (true) {
                     System.out.print("\nEnter a command: ");
@@ -92,7 +80,6 @@ public class Main {
                             if(bookToBorrow.getAvailableCopies() >0) {
                                 if(currentReader != null){
                                     library.borrowBook(currentReader, bookToBorrow);
-
                                 }
                                 System.out.printf("You borrowed the book: %s by %s%n", bookToBorrow.getTitle(), bookToBorrow.getAuthor());
                             }else{
@@ -147,27 +134,96 @@ public class Main {
                             break;
                     }
 
-
                 }
 
 
         }else if(mode == 'l') {
+            //For what we have a librarian class?
             //TODO: adding books, delete books, list users
-            System.out.print("Please, write your password:");
+            boolean isValidPassword = false;
+            System.out.print("Enter your password: ");
+            while (!isValidPassword) {
+                String password = scanner.nextLine().trim();
+                if(password.equals("exit")) System.exit(0);
+                isValidPassword = Objects.equals(password, "admin");
+                if(isValidPassword) continue;
+                System.out.println("Wrong password, try again or type 'exit' to quit: ");
+            }
+
+            if(isValidPassword) {
+                System.out.print("You are successfully logged in.");
+                while(true) {
+                    System.out.print("\nEnter a command: ");
+                    String command = scanner.nextLine().trim().toLowerCase();
+
+                    switch (command) {
+                        case "help":
+                            System.out.println("Available commands:");
+                            System.out.println("list - display the list of users");
+                            System.out.println("add - adding a new book");
+                            System.out.println("remove - remove a book");
+                            System.out.println("exit - exit the program");
+                            break;
+
+                        case "list":
+                            System.out.println("List of users:");
+                            library.listUsers();
+                            break;
+
+                        case "add":
+                            System.out.println("Enter the title of the book: ");
+                            scanner.nextLine();
+                            String title = scanner.nextLine().trim();
+                            System.out.println("Enter the author of the book: ");
+                            scanner.nextLine();
+                            String author = scanner.nextLine().trim();
+                            System.out.println("Enter the publication year of the book: ");
+                            scanner.nextLine();
+                            int year = Integer.parseInt(scanner.nextLine().trim());
+                            System.out.println("Enter the count of available copies of the book: ");
+                            scanner.nextLine();
+                            int countCopies = Integer.parseInt(scanner.nextLine().trim());
+
+                            Book newBook = new Book(UUID.randomUUID(), title,author,year, countCopies);
+                            library.addBook(newBook);
+
+
+                           break;
+
+                        case "remove":
+                            //TODO: we cant remove book, due to borrow history of user, we need to set available copies on 0
+                            break;
+                }}
+            }
         }
 
     }
 
-    private static void registerReader(Scanner scanner, Library library, Reader currentReader){
+    private static void registerReader(){
         System.out.print("Do you want to be registered? (Write y for 'yes'): ");
-        char wantToRegister = scanner.next().charAt(0);
-        if(wantToRegister == 'y') {
-            System.out.print("Please, write your name: ");
-            String name = scanner.next();
-            Reader newReader = new Reader(UUID.randomUUID(), name );
+        boolean wantToRegister = scanner.next().charAt(0) == 'y';
+        if(wantToRegister) {
+            System.out.println("Please, write your name: ");
+            scanner.nextLine();
+            String name = scanner.nextLine();
+            String cardNo = library.getNewCardNo();
+            Reader newReader = new Reader(cardNo, name );
             library.registerUser(newReader);
             currentReader = newReader;
             System.out.println("You are now registered! What we can do for you today?");
-        }}
+        }else{
+            noRegistration();
+        }
+    }
+    private static void noRegistration(){
+        System.out.print("You are not register user, but if u want u can see what books we have.\n Write 'books' to see our offer or 'q' to quit");
+        String answer = scanner.next();
+        if(answer.equals("q")) {
+            System.out.println("Goodbye!");
+            System.exit(0);
+        } else if (answer.equals("books")) {
+            library.listBooks();
+        }
+    }
 
 }
