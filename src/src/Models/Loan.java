@@ -26,6 +26,8 @@ public class Loan {
         return loanDate;
     }
 
+    public void setLoanDate(LocalDate loanDate) {this.loanDate = loanDate;}
+
     public LocalDate getReturnDate() {
         return returnDate;
     }

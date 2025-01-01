@@ -20,6 +20,7 @@ public class LibraryService {
         readers = new ArrayList<>();
         loadUsersData();
         loadData();
+        loadLoans();
     }
 
     // Dodanie książki do biblioteki
@@ -43,10 +44,53 @@ public class LibraryService {
     public void borrowBook(Reader reader, Book book) {
         if (book.getAvailableCopies() > 0) {
             book.decreaseAvailableCopies();
-            loans.add(new Loan(reader, book));
+            Loan loan = new Loan(reader, book);
+            loans.add(loan);
+            saveLoans();
             System.out.println(reader.getName() + " has borrowed " + book.getTitle());
         } else {
             System.out.println("No available copies of " + book.getTitle());
+        }
+    }
+
+    public void saveLoans() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("Library-Management-System/src/src/Files/loans.txt"))) {
+            for (Loan loan : loans) {
+                writer.write(loan.getReader().getCardNo() + "," + loan.getBook().getId() + "," + loan.getLoanDate() + "," + (loan.getReturnDate() != null ? loan.getReturnDate() : "") + "\n");
+            }
+            System.out.println("Loans saved to loans.txt");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void loadLoans() {
+        try (BufferedReader reader = new BufferedReader(new FileReader("Library-Management-System/src/src/Files/loans.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length < 3) {
+                    System.out.println("Error in line: " + line);
+                    continue;
+                }
+
+                String cardNo = parts[0].trim();
+                UUID bookId = UUID.fromString(parts[1].trim());
+                LocalDate loanDate = LocalDate.parse(parts[2].trim());
+                LocalDate returnDate = parts.length > 3 && !parts[3].trim().isEmpty() ? LocalDate.parse(parts[3].trim()) : null;
+
+                Reader loanReader = readers.stream().filter(r -> r.getCardNo().equals(cardNo)).findFirst().orElse(null);
+                Book loanBook = books.stream().filter(b -> b.getId().equals(bookId)).findFirst().orElse(null);
+
+                if (loanReader != null && loanBook != null) {
+                    Loan loan = new Loan(loanReader, loanBook);
+                    loan.setLoanDate(loanDate);
+                    loan.setReturnDate(returnDate);
+                    loans.add(loan);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -156,7 +200,7 @@ public class LibraryService {
                     System.out.println("Error in line: " + line);
                     continue;
                 }
-
+                UUID id = UUID.fromString(parts[0].trim());
                 String title = parts[1].trim();
                 String author = parts[2].trim();
                 int year = 0;
@@ -176,7 +220,7 @@ public class LibraryService {
                     System.out.println("Error copies: " + parts[4]);
                     continue;
                 }
-                books.add(new Book(UUID.randomUUID(), title, author, year, availableCopies));
+                books.add(new Book(id, title, author, year, availableCopies));
             }
         } catch (IOException e) {
             e.printStackTrace();

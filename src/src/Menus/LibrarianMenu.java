@@ -92,10 +92,14 @@ public class LibrarianMenu {
 
         Reader reader = foundReaders.get(0);
         List<Loan> loans = libraryService.getLoansForReader(reader);
-
-        System.out.println("Loan history for " + reader.getName() + " (Card No: " + reader.getCardNo() + "):");
-        for (Loan loan : loans) {
-            System.out.println("Book: " + loan.getBook().getTitle() + ", Borrowed on: " + loan.getLoanDate() + ", Returned on: " + (loan.getReturnDate() != null ? loan.getReturnDate() : "Not returned yet"));
+        if (loans.isEmpty()) {
+            System.out.println("This reader has no loan history.");
+        }
+        else {
+            System.out.println("Loan history for " + reader.getName() + " (Card No: " + reader.getCardNo() + "):");
+            for (Loan loan : loans) {
+                System.out.println("Book: " + loan.getBook().getTitle() + ", Borrowed on: " + loan.getLoanDate() + ", Returned on: " + (loan.getReturnDate() != null ? loan.getReturnDate() : "Not returned yet"));
+            }
         }
     }
 }
