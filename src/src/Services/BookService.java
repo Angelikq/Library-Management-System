@@ -68,7 +68,12 @@ public class BookService {
         if (!foundBooks.isEmpty()) {
             System.out.println("Found books:");
             for (Book book : foundBooks) {
-                System.out.printf("ID: %-5s Title: %-30s%n", book.getId(), book.getTitle());
+                System.out.printf("ID: %-5s Title: %-30s Author: %-25s Year: %-4d Available Copies: %-3d%n",
+                        book.getId(),
+                        book.getTitle(),
+                        book.getAuthor(),
+                        book.getYear(),
+                        book.getAvailableCopies());
             }
         } else {
             System.out.println("No books found matching the criteria.");

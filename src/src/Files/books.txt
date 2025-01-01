@@ -5409,6 +5409,6 @@ ae65b2cb-28ec-44ad-bd36-230ab62f0648,Legends of the Sea,Emma Anderson,2019,15
 2a823bcd-64cc-4320-a358-f8ad1a04d02e,Legends of the Sea,Emma Anderson,2019,15
 512e1c4a-8958-43d1-bc0d-19f4ca366727,Dreams of the Future,Daniel Thomas,2021,6
 12f30541-052f-412d-806d-afaf682f0b49,The Great Adventure,John Smith,1995,5
-7e17fd20-b1bf-4409-9a10-355ac3b34529,Mystery of the Night,Jane Doe,2000,3
+7e17fd20-b1bf-4409-9a10-355ac3b34529,Mystery of the Night,Jane Doe,2000,2
 1a3ccad7-b2c7-49a6-a716-96d0fd7896c6,Journey to the Stars,Emily Johnson,2015,8
 350f6637-6111-44f7-969d-ccbd292b0e17,The Lost Kingdom,Michael Brown,2010,4

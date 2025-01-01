@@ -52,7 +52,6 @@ public class ReaderMenu {
 
     private static void registerReader() {
         System.out.print("Enter your name: ");
-        scanner.nextLine();
         String name = scanner.nextLine();
         String cardNo = libraryService.getNewCardNo();
         currentReader = new Reader(cardNo, name);

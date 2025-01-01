@@ -27,6 +27,7 @@ public class LoanService {
             Loan loan = new Loan(reader, book);
             loans.add(loan);
             fileManager.saveLoans();
+            fileManager.saveData();
             System.out.println(reader.getName() + " has borrowed " + book.getTitle());
         } else {
             System.out.println("No available copies of " + book.getTitle());
@@ -38,6 +39,8 @@ public class LoanService {
             if (loan.getReader().equals(reader) && loan.getBook().equals(book) && loan.getReturnDate() == null) {
                 loan.setReturnDate(LocalDate.now());
                 book.increaseAvailableCopies();
+                fileManager.saveLoans();
+                fileManager.saveData();
                 System.out.println(reader.getName() + " has returned " + book.getTitle());
                 break;
             }
