@@ -1,15 +1,21 @@
+package Services;
+
+import Models.*;
+import Models.Reader;
 import java.io.*;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.Scanner;
 
-public class Library {
+
+public class LibraryService {
     private List<Book> books;
-    private List<User> users;
     private List<Loan> loans;
     private List<Reader> readers;
-    public Library() {
+    private static final Scanner scanner = new Scanner(System.in);
+
+    public LibraryService() {
         books = new ArrayList<>();
-        users = new ArrayList<>();
         loans = new ArrayList<>();
         readers = new ArrayList<>();
         loadUsersData();
@@ -29,20 +35,10 @@ public class Library {
 
     // Dodanie użytkownika
     public void registerUser(Reader reader) {
-        users.add(reader);
+        readers.add(reader);
         saveUser(reader);
     }
-    public void saveUser(Reader reader) {
-        String filePath = "users.txt";
-        String newLine = reader.getCardNo() + "," + reader.getName() + ",reader";
 
-        try (FileWriter writer = new FileWriter(filePath, true)) {
-            writer.write(newLine + System.lineSeparator());
-        } catch (IOException e) {
-            System.out.println("Error while saving user.");
-            e.printStackTrace();
-        }
-    }
     // Wypożyczenie książki
     public void borrowBook(Reader reader, Book book) {
         if (book.getAvailableCopies() > 0) {
@@ -67,15 +63,36 @@ public class Library {
     }
 
     // Wyszukiwanie książek
-    public List<Book> searchBooks(String titleOrAuthor) {
+    public List<Book> searchBooks() {
+        System.out.print("Enter title, author, or year (min 3 characters): ");
+        String search = scanner.nextLine().trim();
+
         List<Book> foundBooks = new ArrayList<>();
+
+        if (search.length() < 3) {
+            System.out.println("Please enter at least 3 characters.");
+            return foundBooks;
+        }
         for (Book book : books) {
-            if (book.getTitle().contains(titleOrAuthor) || book.getAuthor().contains(titleOrAuthor)) {
+            boolean matchesTitle = book.getTitle().toLowerCase().contains(search.toLowerCase());
+            boolean matchesAuthor = book.getAuthor().toLowerCase().contains(search.toLowerCase());
+            boolean matchesYear = String.valueOf(book.getYear()).contains(search);
+
+            if (matchesTitle || matchesAuthor || matchesYear) {
                 foundBooks.add(book);
             }
         }
+        if (!foundBooks.isEmpty()) {
+            System.out.println("Found books:");
+            for (Book book : foundBooks) {
+                System.out.printf("ID: %-5s Title: %-30s%n", book.getId(), book.getTitle());
+            }
+        } else {
+            System.out.println("No books found matching the criteria.");
+        }
         return foundBooks;
     }
+
 
     public void listBooks() {
         System.out.println("Books in library:");
@@ -97,14 +114,14 @@ public class Library {
 
     // Wyświetlanie użytkowników
     public void listUsers() {
-        for (User user : users) {
+        for (User user : readers) {
             System.out.println(user.getName() + " - " + user.getRole());
         }
     }
 
     // Zapis danych do pliku
     public void saveData() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("books.txt"))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("Library-Management-System/src/src/Files/books.txt"))) {
             for (Book book : books) {
                 writer.write( book.getId() + "," + book.getTitle() + "," + book.getAuthor() + "," + book.getYear() + "," + book.getAvailableCopies() + "\n");
             }
@@ -114,9 +131,21 @@ public class Library {
         }
     }
 
+    public void saveUser(Reader reader) {
+        String filePath = "Library-Management-System/src/src/Files/users.txt";
+        String newLine = reader.getCardNo() + "," + reader.getName() + ",reader";
+
+        try (FileWriter writer = new FileWriter(filePath, true)) {
+            writer.write(newLine + System.lineSeparator());
+        } catch (IOException e) {
+            System.out.println("Error while saving user.");
+            e.printStackTrace();
+        }
+    }
+
     // Wczytanie danych z pliku
     public void loadData() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("books.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("Library-Management-System/src/src/Files/books.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("id")) continue;
@@ -147,30 +176,31 @@ public class Library {
                     System.out.println("Error copies: " + parts[4]);
                     continue;
                 }
-                addBook(new Book(UUID.randomUUID(), title, author, year, availableCopies));
+                books.add(new Book(UUID.randomUUID(), title, author, year, availableCopies));
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-        public void loadUsersData() {
-            try (BufferedReader reader = new BufferedReader(new FileReader("users.txt"))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    if (line.startsWith("id")) continue;
 
-                    String[] parts = line.split(",");
+    public void loadUsersData() {
+        try (BufferedReader reader = new BufferedReader(new FileReader("Library-Management-System/src/src/Files/users.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith("id")) continue;
 
-                    String cardNo = parts[0].trim();
-                    String name = parts[1].trim();
+                String[] parts = line.split(",");
 
-                    readers.add(new Reader(cardNo, name));
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+                String cardNo = parts[0].trim();
+                String name = parts[1].trim();
+
+                readers.add(new Reader(cardNo, name));
             }
-
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
     public List<Reader> searchUser(String cardNo) {
         while (cardNo.length() < 6) {
             cardNo = "0" + cardNo;
@@ -186,5 +216,15 @@ public class Library {
     public String getNewCardNo(){
         int nextNumber = readers.size() + 1;
         return String.format("%06d", nextNumber);
+    }
+
+    public List<Loan> getLoansForReader(Reader reader) {
+        List<Loan> readerLoans = new ArrayList<>();
+        for (Loan loan : loans) {
+            if (loan.getReader().equals(reader)) {
+                readerLoans.add(loan);
+            }
+        }
+        return readerLoans;
     }
 }

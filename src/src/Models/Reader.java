@@ -1,4 +1,7 @@
-import java.util.UUID;
+package Models;
+
+
+import Services.LibraryService;
 
 public class Reader implements User {
     private String name;
@@ -22,11 +25,11 @@ public class Reader implements User {
         return "Reader";
     }
 
-    public void borrowBook(Book book, Library library) {
-        library.borrowBook(this, book);
+    public void borrowBook(Book book, LibraryService libraryService) {
+        libraryService.borrowBook(this, book);
     }
 
-    public void returnBook(Book book, Library library) {
-        library.returnBook(this, book);
+    public void returnBook(Book book, LibraryService libraryService) {
+        libraryService.returnBook(this, book);
     }
 }
