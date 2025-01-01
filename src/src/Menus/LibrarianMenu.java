@@ -1,8 +1,8 @@
 package Menus;
 
 import java.util.List;
-import java.util.Scanner;   // add
-import Models.Book;         // add
+import java.util.Scanner;
+import Models.Book;
 import Models.Loan;
 import Models.Reader;
 import Services.LibraryService;
