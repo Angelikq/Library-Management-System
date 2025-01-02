@@ -7,6 +7,7 @@ import Models.Book;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class BookService {
     private List<Book> books;
@@ -50,31 +51,25 @@ public class BookService {
         Scanner scanner = new Scanner(System.in);
         String search = scanner.nextLine().trim();
 
-        List<Book> foundBooks = new ArrayList<>();
-
         if (search.length() < 3) {
             System.out.println("Please enter at least 3 characters.");
-            return foundBooks;
+            return new ArrayList<>();
         }
-        for (Book book : books) {
-            boolean matchesTitle = book.getTitle().toLowerCase().contains(search.toLowerCase());
-            boolean matchesAuthor = book.getAuthor().toLowerCase().contains(search.toLowerCase());
-            boolean matchesYear = String.valueOf(book.getYear()).contains(search);
 
-            if (matchesTitle || matchesAuthor || matchesYear) {
-                foundBooks.add(book);
-            }
-        }
+        List<Book> foundBooks = books.stream()
+                .filter(book -> book.getTitle().toLowerCase().contains(search.toLowerCase()) ||
+                        book.getAuthor().toLowerCase().contains(search.toLowerCase()) ||
+                        String.valueOf(book.getYear()).contains(search))
+                .collect(Collectors.toList());
+
         if (!foundBooks.isEmpty()) {
             System.out.println("Found books:");
-            for (Book book : foundBooks) {
-                System.out.printf("ID: %-5s Title: %-30s Author: %-25s Year: %-4d Available Copies: %-3d%n",
-                        book.getId(),
-                        book.getTitle(),
-                        book.getAuthor(),
-                        book.getYear(),
-                        book.getAvailableCopies());
-            }
+            foundBooks.forEach(book -> System.out.printf("ID: %-5s Title: %-30s Author: %-25s Year: %-4d Available Copies: %-3d%n",
+                    book.getId(),
+                    book.getTitle(),
+                    book.getAuthor(),
+                    book.getYear(),
+                    book.getAvailableCopies()));
         } else {
             System.out.println("No books found matching the criteria.");
         }
