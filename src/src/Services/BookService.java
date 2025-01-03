@@ -10,6 +10,7 @@ import java.util.Scanner;
 import java.util.stream.Collectors;
 
 public class BookService {
+    private static BookService instance;
     private List<Book> books;
     private FileManager fileManager;
 

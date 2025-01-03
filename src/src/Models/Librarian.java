@@ -1,12 +1,20 @@
 package Models;
 
-import Services.LibraryService;
+import Services.*;
+
+import java.util.List;
 
 public class Librarian implements User {
     private String name;
+    private final BookService bookService;
+    private final UserService userService;
+    private final LoanService loanService;
 
-    public Librarian(String name) {
+    public Librarian(String cardNo, String name, BookService bookService, UserService userService, LoanService loanService) {
         this.name = name;
+        this.bookService = bookService;
+        this.userService = userService;
+        this.loanService = loanService;
     }
 
     @Override
@@ -19,19 +27,32 @@ public class Librarian implements User {
         return "Librarian";
     }
 
-    public void addBook(Book book, LibraryService libraryService) {
-        libraryService.addBook(book);
+    public void addBook(Book book) {
+        bookService.addBook(book);
     }
 
-    public void removeBook(Book book, LibraryService libraryService) {
-        libraryService.removeBook(book);
+    public void removeBook(Book book) {
+        bookService.removeBook(book);
     }
 
-    public void listUsers(LibraryService libraryService) {
-        libraryService.listUsers();
+    public void listUsers() {
+        userService.listUsers();
     }
 
-    public void searchBooks(LibraryService libraryService){libraryService.searchBooks();}
+    @Override
+    public List<Book> searchBooks() {
+        return bookService.searchBooks();
+    }
 
-    public void listBooks(LibraryService libraryService){libraryService.listBooks();}
+    public void listBooks(){bookService.listBooks();}
+
+    public List<Reader> searchUser(String cardNo) {
+        return userService.searchUser(cardNo);
+    }
+
+    public List<Loan> getLoansForReader(Reader reader) {
+        return loanService.getLoansForReader(reader);
+    }
+
+    public void registerUser(Reader reader){userService.registerUser(reader);};
 }

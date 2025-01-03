@@ -1,16 +1,23 @@
 package Models;
 
 
-import Services.LibraryService;
+import Services.*;
+
+import java.util.List;
 
 public class Reader implements User {
     private String name;
     private String cardNo;
+    private final BookService bookService;
+    private final LoanService loanService;
 
-    public Reader(String cardNo, String name) {
+    public Reader(String cardNo, String name, BookService bookService, LoanService loanService) {
         this.cardNo = cardNo;
         this.name = name;
+        this.bookService = bookService;
+        this.loanService = loanService;
     }
+
 
     @Override
     public String getName() {
@@ -25,11 +32,21 @@ public class Reader implements User {
         return "Reader";
     }
 
-    public void borrowBook(Book book, LibraryService libraryService) {
-        libraryService.borrowBook(this, book);
+    public void borrowBook(Book book) {
+        loanService.borrowBook(this, book);
     }
 
-    public void returnBook(Book book, LibraryService libraryService) {
-        libraryService.returnBook(this, book);
+    public void returnBook(Book book) {
+        loanService.returnBook(this, book);
+    }
+
+    @Override
+    public void listBooks() {
+        bookService.listBooks();
+    }
+
+    @Override
+    public List<Book> searchBooks() {
+        return bookService.searchBooks();
     }
 }

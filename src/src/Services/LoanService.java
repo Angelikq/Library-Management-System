@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LoanService {
+    private static LoanService instance;
     private List<Loan> loans;
     private FileManager fileManager;
     private BookService bookService;

@@ -1,17 +1,23 @@
 package Menus;
+import Models.*;
+import Services.*;
 
-import Models.Reader;       
-import Models.Book;
-import Services.LibraryService;
-
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;   
-import java.util.UUID; 
+import java.util.Scanner;
+import java.util.UUID;
 
 public class ReaderMenu {
-    private static final LibraryService libraryService = new LibraryService();
-    private static Reader currentReader;
     private static final Scanner scanner = new Scanner(System.in);
+    private static final List<Book> books = new ArrayList<>();
+    private static final List<Reader> readers = new ArrayList<>();
+    private static final List<Loan> loans = new ArrayList<>();
+    private static final BookService bookService = new BookService(books, null);
+    private static final LoanService loanService = new LoanService(loans, null, bookService, null);
+    private static final FileManager fileManager = new FileManager(books, readers, loans, bookService, loanService);
+    private static final UserService userService = new UserService(fileManager.getReaders(), fileManager);
+    private static final Librarian librarian = new Librarian("admin", "Admin", bookService, userService, loanService);
+    private static Reader currentReader;
 
     public void start() {
         System.out.println("Reader Menu:");
@@ -39,7 +45,7 @@ public class ReaderMenu {
             System.out.println("Invalid card number. Please enter a valid number.");
             return;
         }
-        List<Reader> foundUsers = libraryService.searchUser(cardNo);
+        List<Reader> foundUsers = librarian.searchUser(cardNo);
 
         if (foundUsers.size() == 1) {
             currentReader = foundUsers.get(0);
@@ -53,9 +59,9 @@ public class ReaderMenu {
     private static void registerReader() {
         System.out.print("Enter your name: ");
         String name = scanner.nextLine();
-        String cardNo = libraryService.getNewCardNo();
-        currentReader = new Reader(cardNo, name);
-        libraryService.registerUser(currentReader);
+        String cardNo = userService.getNewCardNo();
+        currentReader = new Reader(cardNo, name, bookService, loanService);
+        librarian.registerUser(currentReader);
         System.out.println("Registration complete. Welcome, " + name + "!");
     }
 
@@ -64,8 +70,8 @@ public class ReaderMenu {
         while (true) {
             System.out.print("Enter 'books' to list books, 'find' to search, or 'q' to quit: ");
             switch (scanner.nextLine().trim().toLowerCase()) {
-                case "books" -> libraryService.listBooks();
-                case "find" -> libraryService.searchBooks();
+                case "books" -> bookService.listBooks();
+                case "find" -> bookService.searchBooks();
                 case "q" -> {
                     System.out.println("Goodbye!");
                     return;
@@ -80,8 +86,8 @@ public class ReaderMenu {
             System.out.print("Enter a command (type 'help' for options): ");
             switch (scanner.nextLine().trim().toLowerCase()) {
                 case "help" -> printUserHelp();
-                case "list" -> libraryService.listBooks();
-                case "find" -> libraryService.searchBooks();
+                case "list" -> bookService.listBooks();
+                case "find" -> bookService.searchBooks();
                 case "borrow" -> borrowBook();
                 case "return" -> returnBook();
                 case "exit" -> {
@@ -94,7 +100,7 @@ public class ReaderMenu {
     }
 
     private static void borrowBook() {
-        List<Book> foundBooks = libraryService.searchBooks();
+        List<Book> foundBooks = bookService.searchBooks();
         Book bookToBorrow = null;
 
         if (foundBooks.size() > 1) {
@@ -115,7 +121,7 @@ public class ReaderMenu {
         }
         if(bookToBorrow.getAvailableCopies() >0) {
             if(currentReader != null){
-                libraryService.borrowBook(currentReader, bookToBorrow);
+                currentReader.borrowBook(bookToBorrow);
             }
             System.out.printf("You borrowed the book: %s by %s%n", bookToBorrow.getTitle(), bookToBorrow.getAuthor());
         }else{
