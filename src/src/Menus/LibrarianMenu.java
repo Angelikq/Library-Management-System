@@ -13,7 +13,7 @@ public class LibrarianMenu {
     private static final List<Reader> readers = new ArrayList<>();
     private static final List<Loan> loans = new ArrayList<>();
     private static final BookService bookService = new BookService(books, null);
-    private static final LoanService loanService = new LoanService(loans, null, bookService, null);
+    private static final LoanService loanService = new LoanService(loans, null, bookService);
     private static final FileManager fileManager = new FileManager(books, readers, loans, bookService, loanService);
     private static final UserService userService = new UserService(fileManager.getReaders(), fileManager);
     private static final Librarian librarian = new Librarian("admin", "Admin", bookService, userService, loanService);

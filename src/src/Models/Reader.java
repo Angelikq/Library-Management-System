@@ -8,8 +8,8 @@ import java.util.List;
 public class Reader implements User {
     private String name;
     private String cardNo;
-    private final BookService bookService;
-    private final LoanService loanService;
+    private BookService bookService;
+    private LoanService loanService;
 
     public Reader(String cardNo, String name, BookService bookService, LoanService loanService) {
         this.cardNo = cardNo;
@@ -48,5 +48,9 @@ public class Reader implements User {
     @Override
     public List<Book> searchBooks() {
         return bookService.searchBooks();
+    }
+
+    public void setLoanService(LoanService loanService) {
+        this.loanService = loanService;
     }
 }

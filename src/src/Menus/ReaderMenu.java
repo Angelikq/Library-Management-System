@@ -6,15 +6,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
-
 public class ReaderMenu {
     private static final Scanner scanner = new Scanner(System.in);
     private static final List<Book> books = new ArrayList<>();
     private static final List<Reader> readers = new ArrayList<>();
     private static final List<Loan> loans = new ArrayList<>();
-    private static final BookService bookService = new BookService(books, null);
-    private static final LoanService loanService = new LoanService(loans, null, bookService, null);
-    private static final FileManager fileManager = new FileManager(books, readers, loans, bookService, loanService);
+    private static final FileManager fileManager = new FileManager(books, readers, loans, null, null);
+    private static final BookService bookService = new BookService(books, fileManager);
+    private static final LoanService loanService = new LoanService(loans, fileManager, bookService);
     private static final UserService userService = new UserService(fileManager.getReaders(), fileManager);
     private static final Librarian librarian = new Librarian("admin", "Admin", bookService, userService, loanService);
     private static Reader currentReader;
@@ -36,7 +35,6 @@ public class ReaderMenu {
 
     private static void authenticateReader() {
         System.out.print("Please enter your card number: ");
-        scanner.nextLine();
         String cardNo = scanner.nextLine().trim();
 
         try {
@@ -49,6 +47,7 @@ public class ReaderMenu {
 
         if (foundUsers.size() == 1) {
             currentReader = foundUsers.get(0);
+            currentReader.setLoanService(loanService);
             System.out.println("Welcome, " + currentReader.getName() + "!");
         } else {
             System.out.println("Card not found. Registering a new user.");
@@ -69,7 +68,8 @@ public class ReaderMenu {
         System.out.println("You can browse the library without registration.");
         while (true) {
             System.out.print("Enter 'books' to list books, 'find' to search, or 'q' to quit: ");
-            switch (scanner.nextLine().trim().toLowerCase()) {
+            String command = scanner.nextLine().trim().toLowerCase();
+            switch (command) {
                 case "books" -> bookService.listBooks();
                 case "find" -> bookService.searchBooks();
                 case "q" -> {
@@ -84,7 +84,8 @@ public class ReaderMenu {
     private static void userActions() {
         while (true) {
             System.out.print("Enter a command (type 'help' for options): ");
-            switch (scanner.nextLine().trim().toLowerCase()) {
+            String command = scanner.nextLine().trim().toLowerCase();
+            switch (command) {
                 case "help" -> printUserHelp();
                 case "list" -> bookService.listBooks();
                 case "find" -> bookService.searchBooks();
@@ -119,21 +120,20 @@ public class ReaderMenu {
             System.out.println("No books found.");
             return;
         }
-        if(bookToBorrow.getAvailableCopies() >0) {
-            if(currentReader != null){
+        if (bookToBorrow.getAvailableCopies() > 0) {
+            if (currentReader != null) {
                 currentReader.borrowBook(bookToBorrow);
             }
             System.out.printf("You borrowed the book: %s by %s%n", bookToBorrow.getTitle(), bookToBorrow.getAuthor());
-        }else{
-            System.out.println("Sorry, but we dont currently have available copy of this book.");
-            return;
+        } else {
+            System.out.println("Sorry, but we don't currently have an available copy of this book.");
         }
     }
 
 
     private boolean promptYesNo (String message){
             System.out.print(message);
-            return scanner.next().trim().equalsIgnoreCase("y");
+            return scanner.nextLine().trim().equalsIgnoreCase("y");
     }
 
 
