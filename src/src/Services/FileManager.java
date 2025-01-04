@@ -13,14 +13,30 @@ public class FileManager {
     private List<Book> books;
     private List<Loan> loans;
     private List<Reader> readers;
+    private BookService bookService;
+    private LoanService loanService;
 
-    public FileManager(List<Book> books, List<Reader> readers, List<Loan> loans) {
+    public FileManager(List<Book> books, List<Reader> readers, List<Loan> loans, BookService bookService, LoanService loanService) {
         this.books = books;
         this.readers = readers;
         this.loans = loans;
+        this.bookService = bookService;
+        this.loanService = loanService;
         loadData();
         loadUsersData();
         loadLoans();
+    }
+
+    public List<Book> getBooks() {
+        return books;
+    }
+
+    public List<Reader> getReaders() {
+        return readers;
+    }
+
+    public List<Loan> getLoans() {
+        return loans;
     }
 
     public void saveData() {
@@ -97,7 +113,7 @@ public class FileManager {
                 String cardNo = parts[0].trim();
                 String name = parts[1].trim();
 
-                readers.add(new Reader(cardNo, name));
+                readers.add(new Reader(cardNo, name, bookService, loanService));
             }
         } catch (IOException e) {
             e.printStackTrace();

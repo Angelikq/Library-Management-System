@@ -1,17 +1,23 @@
 package Menus;
 
+import Models.*;
+import Services.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import Models.Book;
-import Models.Loan;
-import Models.Reader;
-import Services.LibraryService;
-
 import java.util.UUID;
 
 public class LibrarianMenu {
-    private static final LibraryService libraryService = new LibraryService();
     private static final Scanner scanner = new Scanner(System.in);
+    private static final List<Book> books = new ArrayList<>();
+    private static final List<Reader> readers = new ArrayList<>();
+    private static final List<Loan> loans = new ArrayList<>();
+    private static final BookService bookService = new BookService(books, null);
+    private static final LoanService loanService = new LoanService(loans, null, bookService);
+    private static final FileManager fileManager = new FileManager(books, readers, loans, bookService, loanService);
+    private static final UserService userService = new UserService(fileManager.getReaders(), fileManager);
+    private static final Librarian librarian = new Librarian("admin", "Admin", bookService, userService, loanService);
+
 
     public void start() {
         System.out.println("Librarian Menu:");
@@ -24,9 +30,9 @@ public class LibrarianMenu {
             String command = scanner.nextLine().trim().toLowerCase();
             switch (command) {
                 case "help" -> printLibrarianHelp();
-                case "books" -> libraryService.listBooks();
-                case "find" ->  libraryService.searchBooks();
-                case "list" -> libraryService.listUsers();
+                case "books" -> librarian.listBooks();
+                case "find" ->  librarian.searchBooks();
+                case "list" -> librarian.listUsers();
                 case "add" -> addBook();
                 case "remove" -> removeBook();
                 case "history" -> displayReaderHistory();
@@ -59,7 +65,7 @@ public class LibrarianMenu {
         int countCopies = Integer.parseInt(scanner.nextLine().trim());
 
         Book newBook = new Book(UUID.randomUUID(), title,author,year, countCopies);
-        libraryService.addBook(newBook);
+        librarian.addBook(newBook);
         System.out.println("Book added.");
     }
 
@@ -83,7 +89,7 @@ public class LibrarianMenu {
     private void displayReaderHistory() {
         System.out.print("Enter reader's card number: ");
         String cardNo = scanner.nextLine().trim();
-        List<Reader> foundReaders = libraryService.searchUser(cardNo);
+        List<Reader> foundReaders = librarian.searchUser(cardNo);
 
         if (foundReaders.isEmpty()) {
             System.out.println("No reader found with card number: " + cardNo);
@@ -91,7 +97,7 @@ public class LibrarianMenu {
         }
 
         Reader reader = foundReaders.get(0);
-        List<Loan> loans = libraryService.getLoansForReader(reader);
+        List<Loan> loans = librarian.getLoansForReader(reader);
         if (loans.isEmpty()) {
             System.out.println("This reader has no loan history.");
         }

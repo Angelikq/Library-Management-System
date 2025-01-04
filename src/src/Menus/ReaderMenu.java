@@ -1,17 +1,22 @@
 package Menus;
+import Models.*;
+import Services.*;
 
-import Models.Reader;       
-import Models.Book;
-import Services.LibraryService;
-
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;   
-import java.util.UUID; 
-
+import java.util.Scanner;
+import java.util.UUID;
 public class ReaderMenu {
-    private static final LibraryService libraryService = new LibraryService();
-    private static Reader currentReader;
     private static final Scanner scanner = new Scanner(System.in);
+    private static final List<Book> books = new ArrayList<>();
+    private static final List<Reader> readers = new ArrayList<>();
+    private static final List<Loan> loans = new ArrayList<>();
+    private static final FileManager fileManager = new FileManager(books, readers, loans, null, null);
+    private static final BookService bookService = new BookService(books, fileManager);
+    private static final LoanService loanService = new LoanService(loans, fileManager, bookService);
+    private static final UserService userService = new UserService(fileManager.getReaders(), fileManager);
+    private static final Librarian librarian = new Librarian("admin", "Admin", bookService, userService, loanService);
+    private static Reader currentReader;
 
     public void start() {
         System.out.println("Reader Menu:");
@@ -30,7 +35,6 @@ public class ReaderMenu {
 
     private static void authenticateReader() {
         System.out.print("Please enter your card number: ");
-        scanner.nextLine();
         String cardNo = scanner.nextLine().trim();
 
         try {
@@ -39,10 +43,11 @@ public class ReaderMenu {
             System.out.println("Invalid card number. Please enter a valid number.");
             return;
         }
-        List<Reader> foundUsers = libraryService.searchUser(cardNo);
+        List<Reader> foundUsers = librarian.searchUser(cardNo);
 
         if (foundUsers.size() == 1) {
             currentReader = foundUsers.get(0);
+            currentReader.setLoanService(loanService);
             System.out.println("Welcome, " + currentReader.getName() + "!");
         } else {
             System.out.println("Card not found. Registering a new user.");
@@ -53,9 +58,9 @@ public class ReaderMenu {
     private static void registerReader() {
         System.out.print("Enter your name: ");
         String name = scanner.nextLine();
-        String cardNo = libraryService.getNewCardNo();
-        currentReader = new Reader(cardNo, name);
-        libraryService.registerUser(currentReader);
+        String cardNo = userService.getNewCardNo();
+        currentReader = new Reader(cardNo, name, bookService, loanService);
+        librarian.registerUser(currentReader);
         System.out.println("Registration complete. Welcome, " + name + "!");
     }
 
@@ -63,9 +68,10 @@ public class ReaderMenu {
         System.out.println("You can browse the library without registration.");
         while (true) {
             System.out.print("Enter 'books' to list books, 'find' to search, or 'q' to quit: ");
-            switch (scanner.nextLine().trim().toLowerCase()) {
-                case "books" -> libraryService.listBooks();
-                case "find" -> libraryService.searchBooks();
+            String command = scanner.nextLine().trim().toLowerCase();
+            switch (command) {
+                case "books" -> bookService.listBooks();
+                case "find" -> bookService.searchBooks();
                 case "q" -> {
                     System.out.println("Goodbye!");
                     return;
@@ -78,10 +84,11 @@ public class ReaderMenu {
     private static void userActions() {
         while (true) {
             System.out.print("Enter a command (type 'help' for options): ");
-            switch (scanner.nextLine().trim().toLowerCase()) {
+            String command = scanner.nextLine().trim().toLowerCase();
+            switch (command) {
                 case "help" -> printUserHelp();
-                case "list" -> libraryService.listBooks();
-                case "find" -> libraryService.searchBooks();
+                case "list" -> bookService.listBooks();
+                case "find" -> bookService.searchBooks();
                 case "borrow" -> borrowBook();
                 case "return" -> returnBook();
                 case "exit" -> {
@@ -94,7 +101,7 @@ public class ReaderMenu {
     }
 
     private static void borrowBook() {
-        List<Book> foundBooks = libraryService.searchBooks();
+        List<Book> foundBooks = bookService.searchBooks();
         Book bookToBorrow = null;
 
         if (foundBooks.size() > 1) {
@@ -113,21 +120,20 @@ public class ReaderMenu {
             System.out.println("No books found.");
             return;
         }
-        if(bookToBorrow.getAvailableCopies() >0) {
-            if(currentReader != null){
-                libraryService.borrowBook(currentReader, bookToBorrow);
+        if (bookToBorrow.getAvailableCopies() > 0) {
+            if (currentReader != null) {
+                currentReader.borrowBook(bookToBorrow);
             }
             System.out.printf("You borrowed the book: %s by %s%n", bookToBorrow.getTitle(), bookToBorrow.getAuthor());
-        }else{
-            System.out.println("Sorry, but we dont currently have available copy of this book.");
-            return;
+        } else {
+            System.out.println("Sorry, but we don't currently have an available copy of this book.");
         }
     }
 
 
     private boolean promptYesNo (String message){
             System.out.print(message);
-            return scanner.next().trim().equalsIgnoreCase("y");
+            return scanner.nextLine().trim().equalsIgnoreCase("y");
     }
 
 

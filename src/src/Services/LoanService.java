@@ -9,16 +9,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LoanService {
+    private static LoanService instance;
     private List<Loan> loans;
     private FileManager fileManager;
     private BookService bookService;
-    private UserService userService;
 
-    public LoanService(List<Loan> loans, FileManager fileManager, BookService bookService, UserService userService) {
+    public LoanService(List<Loan> loans, FileManager fileManager, BookService bookService) {
         this.loans = loans;
         this.fileManager = fileManager;
         this.bookService = bookService;
-        this.userService = userService;
     }
 
     public void borrowBook(Reader reader, Book book) {
@@ -28,7 +27,6 @@ public class LoanService {
             loans.add(loan);
             fileManager.saveLoans();
             fileManager.saveData();
-            System.out.println(reader.getName() + " has borrowed " + book.getTitle());
         } else {
             System.out.println("No available copies of " + book.getTitle());
         }
