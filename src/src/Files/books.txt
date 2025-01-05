@@ -11,7 +11,7 @@ aeaf162b-de86-4972-99e8-1b9b563c282f,Tales of the Brave,David Martinez,2017,2
 fd537bfc-8152-4a64-bb5c-706389673121,The Great Adventure,John Smith,1995,5
 b0cf39cb-56d6-4e46-8040-4310314e720b,Mystery of the Night,Jane Doe,2000,3
 80f4dfd5-bce7-4cf8-9ba8-19f74ab7bfb2,Journey to the Stars,Emily Johnson,2015,8
-72ce82d4-5626-4eae-8711-cd57edf951e4,The Lost Kingdom,Michael Brown,2010,4
+72ce82d4-5626-4eae-8711-cd57edf951e4,The Lost Kingdom,Michael Brown,2010,0
 5a5acb38-3c5c-43a4-84d3-31ac5174d4c1,Echoes of Eternity,Sarah Davis,2020,12
 bd4d5167-e799-4f2b-a1f0-ef2a665fa3e0,Whispers of the Past,Robert Wilson,2018,7
 9ca51bfb-d3b1-4d02-94eb-54a82a299a84,Shadows of Tomorrow,Laura Garcia,1998,10
@@ -5410,5 +5410,5 @@ ae65b2cb-28ec-44ad-bd36-230ab62f0648,Legends of the Sea,Emma Anderson,2019,15
 512e1c4a-8958-43d1-bc0d-19f4ca366727,Dreams of the Future,Daniel Thomas,2021,6
 12f30541-052f-412d-806d-afaf682f0b49,The Great Adventure,John Smith,1995,5
 7e17fd20-b1bf-4409-9a10-355ac3b34529,Mystery of the Night,Jane Doe,2000,2
-1a3ccad7-b2c7-49a6-a716-96d0fd7896c6,Journey to the Stars,Emily Johnson,2015,7
-350f6637-6111-44f7-969d-ccbd292b0e17,The Lost Kingdom,Michael Brown,2010,4
+1a3ccad7-b2c7-49a6-a716-96d0fd7896c6,Journey to the Stars,Emily Johnson,2015,6
+350f6637-6111-44f7-969d-ccbd292b0e17,The Lost Kingdom,Michael Brown,2010,3

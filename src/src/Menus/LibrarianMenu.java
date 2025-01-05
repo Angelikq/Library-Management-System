@@ -1,5 +1,7 @@
 package Menus;
 
+import Exceptions.BookNotFoundException;
+import Exceptions.UserNotFoundException;
 import Models.*;
 import Services.*;
 import java.util.ArrayList;
@@ -9,17 +11,13 @@ import java.util.UUID;
 
 public class LibrarianMenu {
     private static final Scanner scanner = new Scanner(System.in);
-    private static final List<Book> books = new ArrayList<>();
-    private static final List<Reader> readers = new ArrayList<>();
-    private static final List<Loan> loans = new ArrayList<>();
-    private static final BookService bookService = new BookService(books, null);
-    private static final LoanService loanService = new LoanService(loans, null, bookService);
-    private static final FileManager fileManager = new FileManager(books, readers, loans, bookService, loanService);
-    private static final UserService userService = new UserService(fileManager.getReaders(), fileManager);
-    private static final Librarian librarian = new Librarian("admin", "Admin", bookService, userService, loanService);
+    private LibraryService libraryService;
+    private Librarian librarian;
 
 
-    public void start() {
+    public void start(LibraryService libraryService) throws UserNotFoundException, BookNotFoundException {
+        this.libraryService = libraryService;
+        this.librarian =new Librarian( "Admin", libraryService);
         System.out.println("Librarian Menu:");
         if (!authenticateLibrarian()) {
             System.out.println("Authentication failed. Returning to main menu.");
@@ -50,7 +48,7 @@ public class LibrarianMenu {
         return scanner.nextLine().equals("admin");
     }
 
-    private static void addBook() {
+    private void addBook() {
         System.out.println("Enter the title of the book: ");
         scanner.nextLine();
         String title = scanner.nextLine().trim();
@@ -69,16 +67,11 @@ public class LibrarianMenu {
         System.out.println("Book added.");
     }
 
-    private void removeBook() {
+    private void removeBook() throws BookNotFoundException {
         System.out.print("Enter book id to remove: ");
         UUID id = UUID.fromString(scanner.nextLine());
-        Book bookToRemove = null;
-        try{
-            bookToRemove = books.stream().filter(book -> book.getId().equals(id)).toList().getFirst();
+        Book bookToRemove = libraryService.getBook(id);
 
-        }catch(NullPointerException e){
-            System.out.println("Book not found.");
-        }
         if (bookToRemove != null) {
             librarian.removeBook(bookToRemove);
         }
@@ -95,17 +88,11 @@ public class LibrarianMenu {
         System.out.println("exit - exit the program");
     }
 
-    private void displayReaderHistory() {
+    private void displayReaderHistory() throws UserNotFoundException {
         System.out.print("Enter reader's card number: ");
         String cardNo = scanner.nextLine().trim();
-        List<Reader> foundReaders = librarian.searchUser(cardNo);
+        Reader reader = librarian.searchUser(cardNo);
 
-        if (foundReaders.isEmpty()) {
-            System.out.println("No reader found with card number: " + cardNo);
-            return;
-        }
-
-        Reader reader = foundReaders.get(0);
         List<Loan> loans = librarian.getLoansForReader(reader);
         if (loans.isEmpty()) {
             System.out.println("This reader has no loan history.");

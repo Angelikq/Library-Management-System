@@ -12,12 +12,10 @@ public class LoanService {
     private static LoanService instance;
     private List<Loan> loans;
     private FileManager fileManager;
-    private BookService bookService;
 
-    public LoanService(List<Loan> loans, FileManager fileManager, BookService bookService) {
+    public LoanService(List<Loan> loans, FileManager fileManager) {
         this.loans = loans;
         this.fileManager = fileManager;
-        this.bookService = bookService;
     }
 
     public void borrowBook(Reader reader, Book book) {
@@ -27,6 +25,8 @@ public class LoanService {
             loans.add(loan);
             fileManager.saveLoans();
             fileManager.saveData();
+            System.out.printf("You borrowed the book: %s by %s%n", book.getTitle(), book.getAuthor());
+
         } else {
             System.out.println("No available copies of " + book.getTitle());
         }

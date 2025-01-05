@@ -1,9 +1,8 @@
 package Services;
 
+import Exceptions.UserNotFoundException;
 import Models.Reader;
 import Models.User;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public class UserService {
@@ -21,17 +20,19 @@ public class UserService {
         }
     }
 
-    public List<Reader> searchUser(String cardNo) {
+    public Reader searchUser(String cardNo) throws UserNotFoundException {
         while (cardNo.length() < 6) {
             cardNo = "0" + cardNo;
         }
-        List<Reader> foundUser = new ArrayList<>();
-        for (Reader reader : readers) {
-            if (reader.getCardNo().contains(cardNo) ) {
-                foundUser.add(reader);
-            }
+        String finalCardNo = cardNo;
+        Reader reader;
+        try{
+            reader = readers.stream().filter(el -> el.getCardNo().equals(finalCardNo)).findFirst().get();
+            return reader;
+        }catch(NullPointerException e){
+            throw new UserNotFoundException();
         }
-        return foundUser;
+
     }
 
     public String getNewCardNo(){
@@ -39,8 +40,15 @@ public class UserService {
         return String.format("%06d", nextNumber);
     }
 
-    public void registerUser(Reader reader) {
-        readers.add(reader);
-        fileManager.saveUser(reader);
+    public void registerUser(String name) {
+        String CardNo = getNewCardNo();
+        try{
+            Reader reader = new Reader(CardNo, name);
+            readers.add(reader);
+            fileManager.saveUser(reader);
+        }catch(Exception e){
+            System.out.println(e);
+        }
+
     }
 }
