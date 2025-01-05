@@ -70,9 +70,18 @@ public class LibrarianMenu {
     }
 
     private void removeBook() {
-        System.out.print("Enter book title to remove: ");
-        String title = scanner.nextLine();
-            //TODO: we cant remove book, due to borrow history of user, we need to set available copies on 0
+        System.out.print("Enter book id to remove: ");
+        UUID id = UUID.fromString(scanner.nextLine());
+        Book bookToRemove = null;
+        try{
+            bookToRemove = books.stream().filter(book -> book.getId().equals(id)).toList().getFirst();
+
+        }catch(NullPointerException e){
+            System.out.println("Book not found.");
+        }
+        if (bookToRemove != null) {
+            librarian.removeBook(bookToRemove);
+        }
     }
 
     private static void printLibrarianHelp() {

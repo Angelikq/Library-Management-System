@@ -25,7 +25,7 @@ public class BookService {
     }
 
     public void removeBook(Book book) {
-        books.remove(book);
+        book.deleteStockOfBook();
         fileManager.saveData();
     }
 
