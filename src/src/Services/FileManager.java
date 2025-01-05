@@ -40,7 +40,7 @@ public class FileManager {
     }
 
     public void saveData() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("Library-Management-System/src/src/Files/books.txt"))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("src/src/Files/books.txt"))) {
             for (Book book : books) {
                 writer.write( book.getId() + "," + book.getTitle() + "," + book.getAuthor() + "," + book.getYear() + "," + book.getAvailableCopies() + "\n");
             }
@@ -51,7 +51,7 @@ public class FileManager {
     }
 
     public void loadData() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("Library-Management-System/src/src/Files/books.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("src/src/Files/books.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("id")) continue;
@@ -90,7 +90,7 @@ public class FileManager {
     }
 
     public void saveUser(Models.Reader reader) {
-        String filePath = "Library-Management-System/src/src/Files/users.txt";
+        String filePath = "src/src/Files/users.txt";
         String newLine = reader.getCardNo() + "," + reader.getName() + ",reader";
 
         try (FileWriter writer = new FileWriter(filePath, true)) {
@@ -103,7 +103,7 @@ public class FileManager {
 
 
     public void loadUsersData() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("Library-Management-System/src/src/Files/users.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("src/src/Files/users.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("id")) continue;
@@ -121,7 +121,7 @@ public class FileManager {
     }
 
     public void saveLoans() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("Library-Management-System/src/src/Files/loans.txt"))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("src/src/Files/loans.txt"))) {
             for (Loan loan : loans) {
                 writer.write(loan.getReader().getCardNo() + "," + loan.getBook().getId() + "," + loan.getLoanDate() + "," + (loan.getReturnDate() != null ? loan.getReturnDate() : "") + "\n");
             }
@@ -132,7 +132,7 @@ public class FileManager {
     }
 
     public void loadLoans() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("Library-Management-System/src/src/Files/loans.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("src/src/Files/loans.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
