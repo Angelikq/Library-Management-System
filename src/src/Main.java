@@ -1,19 +1,27 @@
+import Exceptions.BookNotFoundException;
+import Exceptions.ReadFileException;
+import Exceptions.UserNotFoundException;
 import Menus.*;
+import Services.LibraryService;
 
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws UserNotFoundException, ReadFileException, BookNotFoundException {
+        LibraryService libraryService = new LibraryService();
+
         Scanner scanner = new Scanner(System.in);
         System.out.println("Welcome to the library system!");
-        System.out.print("If you are a user, type 'u'. If you are a librarian, type 'l': ");
+        while (true) {
+            System.out.print("If you are a user, type 'u'. If you are a librarian, type 'l': ");
 
-        char mode = scanner.next().charAt(0);
+            char mode = scanner.next().charAt(0);
 
-        switch (mode) {
-            case 'u' -> new ReaderMenu().start();
-            case 'l' -> new LibrarianMenu().start();
-            default -> System.out.println("Invalid option. Exiting.");
+            switch (mode) {
+                case 'u' -> new ReaderMenu().start(libraryService);
+                case 'l' -> new LibrarianMenu().start(libraryService);
+                default -> System.out.println("Invalid option.");
+            }
         }
     }
 }

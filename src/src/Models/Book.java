@@ -41,6 +41,9 @@ public class Book {
             availableCopies--;
         }
     }
+    public void deleteStockOfBook(){
+        availableCopies = 0;
+    }
 
     public void increaseAvailableCopies() {
         availableCopies++;

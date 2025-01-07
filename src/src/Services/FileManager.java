@@ -1,11 +1,13 @@
 package Services;
 
+import Exceptions.ReadFileException;
 import Models.Book;
 import Models.Loan;
 import Models.Reader;
 
 import java.io.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,18 +15,11 @@ public class FileManager {
     private List<Book> books;
     private List<Loan> loans;
     private List<Reader> readers;
-    private BookService bookService;
-    private LoanService loanService;
 
-    public FileManager(List<Book> books, List<Reader> readers, List<Loan> loans, BookService bookService, LoanService loanService) {
-        this.books = books;
-        this.readers = readers;
-        this.loans = loans;
-        this.bookService = bookService;
-        this.loanService = loanService;
-        loadData();
-        loadUsersData();
-        loadLoans();
+    public FileManager() throws ReadFileException {
+        this.books = loadData();
+        this.readers = loadUsersData();
+        this.loans = loadLoans();
     }
 
     public List<Book> getBooks() {
@@ -40,7 +35,7 @@ public class FileManager {
     }
 
     public void saveData() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("Library-Management-System/src/src/Files/books.txt"))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("src/src/Files/books.txt"))) {
             for (Book book : books) {
                 writer.write( book.getId() + "," + book.getTitle() + "," + book.getAuthor() + "," + book.getYear() + "," + book.getAvailableCopies() + "\n");
             }
@@ -50,8 +45,9 @@ public class FileManager {
         }
     }
 
-    public void loadData() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("Library-Management-System/src/src/Files/books.txt"))) {
+    public List<Book> loadData() throws ReadFileException {
+        List<Book> books = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader("src/src/Files/books.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("id")) continue;
@@ -75,7 +71,6 @@ public class FileManager {
                     continue;
                 }
 
-
                 try {
                     availableCopies = Integer.parseInt(parts[4].trim());
                 } catch (NumberFormatException e) {
@@ -85,12 +80,14 @@ public class FileManager {
                 books.add(new Book(id, title, author, year, availableCopies));
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new ReadFileException();
         }
+        return books;
+
     }
 
     public void saveUser(Models.Reader reader) {
-        String filePath = "Library-Management-System/src/src/Files/users.txt";
+        String filePath = "src/src/Files/users.txt";
         String newLine = reader.getCardNo() + "," + reader.getName() + ",reader";
 
         try (FileWriter writer = new FileWriter(filePath, true)) {
@@ -102,8 +99,9 @@ public class FileManager {
     }
 
 
-    public void loadUsersData() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("Library-Management-System/src/src/Files/users.txt"))) {
+    public List<Reader> loadUsersData() {
+        List<Reader> readers = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader("src/src/Files/users.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("id")) continue;
@@ -113,15 +111,17 @@ public class FileManager {
                 String cardNo = parts[0].trim();
                 String name = parts[1].trim();
 
-                readers.add(new Reader(cardNo, name, bookService, loanService));
+                readers.add(new Reader(cardNo, name));
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return readers;
+
     }
 
     public void saveLoans() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("Library-Management-System/src/src/Files/loans.txt"))) {
+        try (FileWriter writer = new FileWriter("src/src/Files/loans.txt")) {
             for (Loan loan : loans) {
                 writer.write(loan.getReader().getCardNo() + "," + loan.getBook().getId() + "," + loan.getLoanDate() + "," + (loan.getReturnDate() != null ? loan.getReturnDate() : "") + "\n");
             }
@@ -131,8 +131,9 @@ public class FileManager {
         }
     }
 
-    public void loadLoans() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("Library-Management-System/src/src/Files/loans.txt"))) {
+    public List<Loan> loadLoans() {
+        List<Loan> loans = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader("src/src/Files/loans.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
@@ -159,5 +160,6 @@ public class FileManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return loans;
     }
 }

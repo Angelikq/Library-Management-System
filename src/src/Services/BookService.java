@@ -1,12 +1,11 @@
 package Services;
 
+import Exceptions.BookNotFoundException;
 import Models.Book;
 
 import Models.Book;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class BookService {
@@ -15,8 +14,8 @@ public class BookService {
     private FileManager fileManager;
 
     public BookService(List<Book> books, FileManager fileManager) {
-        this.books = books;
         this.fileManager = fileManager;
+        this.books = books;
     }
 
     public void addBook(Book book) {
@@ -25,7 +24,7 @@ public class BookService {
     }
 
     public void removeBook(Book book) {
-        books.remove(book);
+        book.deleteStockOfBook();
         fileManager.saveData();
     }
 
@@ -45,6 +44,16 @@ public class BookService {
                     book.getYear(),
                     book.getAvailableCopies());
         }
+    }
+    public Book getBook(UUID id) throws BookNotFoundException {
+        Book book = null;
+        try{
+            book = books.stream().filter(el -> el.getId().equals(id)).toList().getFirst();
+
+        }catch(NoSuchElementException e){
+            throw new BookNotFoundException();
+        }
+        return book;
     }
 
     public List<Book> searchBooks() {

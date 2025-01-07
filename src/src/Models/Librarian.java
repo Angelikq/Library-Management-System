@@ -1,20 +1,17 @@
 package Models;
 
+import Exceptions.UserNotFoundException;
 import Services.*;
 
 import java.util.List;
 
 public class Librarian implements User {
     private String name;
-    private final BookService bookService;
-    private final UserService userService;
-    private final LoanService loanService;
+    LibraryService libraryService;
 
-    public Librarian(String cardNo, String name, BookService bookService, UserService userService, LoanService loanService) {
+    public Librarian( String name, LibraryService libraryService) {
         this.name = name;
-        this.bookService = bookService;
-        this.userService = userService;
-        this.loanService = loanService;
+        this.libraryService = libraryService;
     }
 
     @Override
@@ -28,31 +25,30 @@ public class Librarian implements User {
     }
 
     public void addBook(Book book) {
-        bookService.addBook(book);
+        libraryService.addBook(book);
     }
 
     public void removeBook(Book book) {
-        bookService.removeBook(book);
+        libraryService.removeBook(book);
     }
 
     public void listUsers() {
-        userService.listUsers();
+        libraryService.listUsers();
     }
 
-    @Override
     public List<Book> searchBooks() {
-        return bookService.searchBooks();
+         return libraryService.searchBooks();
     }
 
-    public void listBooks(){bookService.listBooks();}
+    public void listBooks(){libraryService.listBooks();}
 
-    public List<Reader> searchUser(String cardNo) {
-        return userService.searchUser(cardNo);
+    public Reader searchUser(String cardNo) throws UserNotFoundException {
+        return libraryService.searchUser(cardNo);
     }
 
     public List<Loan> getLoansForReader(Reader reader) {
-        return loanService.getLoansForReader(reader);
+        return libraryService.getLoansForReader(reader);
     }
 
-    public void registerUser(Reader reader){userService.registerUser(reader);};
+    public void registerUser(String name){libraryService.registerUser(name);};
 }
