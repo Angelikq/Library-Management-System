@@ -1,8 +1,6 @@
 package Services;
 
-import Exceptions.BookNotFoundException;
-import Models.Book;
-
+import Exceptions.*;
 import Models.Book;
 
 import java.util.*;
@@ -18,13 +16,27 @@ public class BookService {
         this.books = books;
     }
 
-    public void addBook(Book book) {
+    public void addBook(Book book) throws InvalidBookDataException {
+        if (book.getTitle() == null || book.getTitle().isEmpty()) {
+            throw new InvalidBookDataException("Book title cannot be null or empty.");
+        }
+        if (book.getAuthor() == null || book.getAuthor().isEmpty()) {
+            throw new InvalidBookDataException("Book author cannot be null or empty.");
+        }
+        if (book.getYear() <= 0) {
+            throw new InvalidBookDataException("Book year must be a positive integer.");
+        }
+        if (book.getAvailableCopies() < 0) {
+            throw new InvalidBookDataException("Book available copies cannot be negative.");
+        }
         books.add(book);
         fileManager.saveData();
     }
 
-    public void removeBook(Book book) {
-        book.deleteStockOfBook();
+    public void removeBook(Book book) throws NotFoundException {
+        if (!books.remove(book)) {
+            throw new NotFoundException("Book", book.getId().toString());
+        }
         fileManager.saveData();
     }
 
@@ -45,15 +57,12 @@ public class BookService {
                     book.getAvailableCopies());
         }
     }
-    public Book getBook(UUID id) throws BookNotFoundException {
-        Book book = null;
-        try{
-            book = books.stream().filter(el -> el.getId().equals(id)).toList().getFirst();
 
-        }catch(NoSuchElementException e){
-            throw new BookNotFoundException();
-        }
-        return book;
+    public Book getBook(UUID id) throws NotFoundException {
+        return books.stream()
+                .filter(book -> book.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("Book", id.toString()));
     }
 
     public List<Book> searchBooks() {

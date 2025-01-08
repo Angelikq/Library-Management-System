@@ -1,6 +1,6 @@
 package Services;
 
-import Exceptions.UserNotFoundException;
+import Exceptions.NotFoundException;
 import Models.Reader;
 import Models.User;
 import java.util.List;
@@ -20,7 +20,7 @@ public class UserService {
         }
     }
 
-    public Reader searchUser(String cardNo) throws UserNotFoundException {
+    public Reader searchUser(String cardNo) throws NotFoundException {
         while (cardNo.length() < 6) {
             cardNo = "0" + cardNo;
         }
@@ -30,7 +30,7 @@ public class UserService {
             reader = readers.stream().filter(el -> el.getCardNo().equals(finalCardNo)).findFirst().get();
             return reader;
         }catch(NullPointerException e){
-            throw new UserNotFoundException();
+            throw new NotFoundException("User", finalCardNo);
         }
 
     }

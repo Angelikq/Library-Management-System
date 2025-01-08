@@ -1,5 +1,6 @@
 package Services;
 
+import Exceptions.*;
 import Models.Book;
 import Models.Loan;
 import Models.Reader;
@@ -18,7 +19,7 @@ public class LoanService {
         this.fileManager = fileManager;
     }
 
-    public void borrowBook(Reader reader, Book book) {
+    public void borrowBook(Reader reader, Book book) throws LoanException {
         if (book.getAvailableCopies() > 0) {
             book.decreaseAvailableCopies();
             Loan loan = new Loan(reader, book);
@@ -26,23 +27,22 @@ public class LoanService {
             fileManager.saveLoans();
             fileManager.saveData();
             System.out.printf("You borrowed the book: %s by %s%n", book.getTitle(), book.getAuthor());
-
         } else {
-            System.out.println("No available copies of " + book.getTitle());
+            throw new LoanException("No available copies of " + book.getTitle());
         }
     }
 
-    public void returnBook(Reader reader, Book book) {
-        for (Loan loan : loans) {
-            if (loan.getReader().equals(reader) && loan.getBook().equals(book) && loan.getReturnDate() == null) {
-                loan.setReturnDate(LocalDate.now());
-                book.increaseAvailableCopies();
-                fileManager.saveLoans();
-                fileManager.saveData();
-                System.out.println(reader.getName() + " has returned " + book.getTitle());
-                break;
-            }
-        }
+    public void returnBook(Reader reader, Book book) throws NotFoundException {
+        Loan loanToReturn = loans.stream()
+                .filter(loan -> loan.getReader().equals(reader) && loan.getBook().equals(book) && loan.getReturnDate() == null)
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("Loan", "Reader: " + reader.getCardNo() + ", Book: " + book.getId()));
+
+        loanToReturn.setReturnDate(LocalDate.now());
+        book.increaseAvailableCopies();
+        fileManager.saveLoans();
+        fileManager.saveData();
+        System.out.println(reader.getName() + " has returned " + book.getTitle());
     }
 
     public List<Loan> getLoansForReader(Reader reader) {

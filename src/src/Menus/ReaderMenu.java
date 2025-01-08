@@ -15,7 +15,7 @@ public class ReaderMenu {
     private static Reader currentReader;
     private static InputReader inputReader = new InputReader();
 
-    public void start(LibraryService libraryService) {
+    public void start(LibraryService libraryService) throws LoanException{
         librarian = new Librarian("Admin", libraryService);
         this.libraryService = libraryService;
 
@@ -38,7 +38,7 @@ public class ReaderMenu {
             if (e.shouldBreak()) {
                 System.exit(0);
             }
-        }catch( BookNotFoundException e){
+        }catch( NotFoundException e){
             System.out.println(e.getMessage());
         }
     }
@@ -59,7 +59,7 @@ public class ReaderMenu {
             System.exit(0);
         } catch (NumberFormatException e) {
             System.out.println("Invalid card number. Please enter a valid number.");
-        } catch (UserNotFoundException e) {
+        } catch (NotFoundException e) {
             System.out.println(e.getMessage());
             System.out.println("Registration process");
             registerReader();
@@ -86,7 +86,7 @@ public class ReaderMenu {
         }
     }
 
-    private static void userActions() throws EmptyStringException, ExitCalledException, BookNotFoundException {
+    private static void userActions() throws EmptyStringException, ExitCalledException, NotFoundException, LoanException {
         while (true) {
             System.out.print("Enter a command (type 'help' for options): ");
             String command = inputReader.read().toLowerCase();
@@ -101,7 +101,7 @@ public class ReaderMenu {
         }
     }
 
-    private static void borrowBook() throws EmptyStringException, ExitCalledException, BookNotFoundException {
+    private static void borrowBook() throws EmptyStringException, ExitCalledException, NotFoundException, LoanException {
 
         List<Book> foundBooks = libraryService.searchBooks();
         Book bookToBorrow = null;
@@ -133,7 +133,7 @@ public class ReaderMenu {
             System.out.println("q - to quit");
     }
 
-    private static void returnBook() {
+    private static void returnBook() throws NotFoundException{
         System.out.println("Your borrowed books:");
         List<Loan> userLoans;
 

@@ -1,6 +1,7 @@
 package Models;
 
-import Exceptions.UserNotFoundException;
+import Exceptions.InvalidBookDataException;
+import Exceptions.NotFoundException;
 import Services.*;
 
 import java.util.List;
@@ -24,11 +25,11 @@ public class Librarian implements User {
         return "Librarian";
     }
 
-    public void addBook(Book book) {
+    public void addBook(Book book) throws InvalidBookDataException {
         libraryService.addBook(book);
     }
 
-    public void removeBook(Book book) {
+    public void removeBook(Book book) throws NotFoundException{
         libraryService.removeBook(book);
     }
 
@@ -42,7 +43,7 @@ public class Librarian implements User {
 
     public void listBooks(){libraryService.listBooks();}
 
-    public Reader searchUser(String cardNo) throws UserNotFoundException {
+    public Reader searchUser(String cardNo) throws NotFoundException {
         return libraryService.searchUser(cardNo);
     }
 

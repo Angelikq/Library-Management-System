@@ -1,8 +1,9 @@
 package Services;
 
-import Exceptions.BookNotFoundException;
+import Exceptions.InvalidBookDataException;
+import Exceptions.LoanException;
 import Exceptions.ReadFileException;
-import Exceptions.UserNotFoundException;
+import Exceptions.NotFoundException;
 import Models.*;
 
 import Models.Book;
@@ -28,19 +29,19 @@ public class LibraryService {
         this.loanService = new LoanService(loans, fileManager);
 
     }
-    public void addBook(Book book){
+    public void addBook(Book book) throws InvalidBookDataException {
         bookService.addBook(book);
     }
-    public void removeBook(Book book){bookService.removeBook(book);}
-    public Book getBook(UUID bookId) throws BookNotFoundException {return bookService.getBook(bookId);}
+    public void removeBook(Book book)throws NotFoundException{bookService.removeBook(book);}
+    public Book getBook(UUID bookId) throws NotFoundException {return bookService.getBook(bookId);}
     public void listBooks(){bookService.listBooks();}
     public List<Book> searchBooks(){return bookService.searchBooks();}
 
     public List<Loan> getLoansForReader(Reader reader){return loanService.getLoansForReader(reader);}
-    public void returnBook(Reader reader, Book book){loanService.returnBook(reader,book);}
-    public void borrowBook(Reader reader, Book book){loanService.borrowBook(reader, book);}
+    public void returnBook(Reader reader, Book book)throws NotFoundException{loanService.returnBook(reader,book);}
+    public void borrowBook(Reader reader, Book book)throws LoanException {loanService.borrowBook(reader, book);}
 
     public void listUsers(){userService.listUsers();}
-    public Reader searchUser(String cardNo) throws UserNotFoundException {return userService.searchUser(cardNo);}
+    public Reader searchUser(String cardNo) throws NotFoundException {return userService.searchUser(cardNo);}
     public void registerUser(String name){userService.registerUser(name);}
 }

@@ -1,13 +1,11 @@
-import Exceptions.BookNotFoundException;
-import Exceptions.ReadFileException;
-import Exceptions.UserNotFoundException;
+import Exceptions.*;
 import Menus.*;
 import Services.LibraryService;
 
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) throws UserNotFoundException, ReadFileException, BookNotFoundException {
+    public static void main(String[] args) throws InvalidBookDataException,LoanException, NotFoundException,AuthenticationFailedException,InvalidCommandException, ReadFileException {
         LibraryService libraryService = new LibraryService();
 
         Scanner scanner = new Scanner(System.in);
