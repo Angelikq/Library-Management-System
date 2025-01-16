@@ -19,20 +19,24 @@ public class LoanService {
         this.fileManager = fileManager;
     }
 
-    public void borrowBook(Reader reader, Book book) throws LoanException {
-        if (book.getAvailableCopies() > 0) {
-            book.decreaseAvailableCopies();
-            Loan loan = new Loan(reader, book);
-            loans.add(loan);
-            fileManager.saveLoans();
-            fileManager.saveData();
-            System.out.printf("You borrowed the book: %s by %s%n", book.getTitle(), book.getAuthor());
-        } else {
-            throw new LoanException("No available copies of " + book.getTitle());
+    public void borrowBook(Reader reader, Book book) throws LoanException, WriteFileException, NotFoundException {
+        try {
+            if (book.getAvailableCopies() > 0) {
+                book.decreaseAvailableCopies();
+                Loan loan = new Loan(reader, book);
+                loans.add(loan);
+                fileManager.saveLoans();
+                fileManager.saveData();
+                System.out.printf("You borrowed the book: %s by %s%n", book.getTitle(), book.getAuthor());
+            } else {
+                throw new LoanException(book.getTitle());
+            }
+        } catch (NullPointerException e) {
+            throw new NotFoundException("Book", "provided");
         }
     }
 
-    public void returnBook(Reader reader, Book book) throws NotFoundException {
+    public void returnBook(Reader reader, Book book) throws NotFoundException, WriteFileException {
         Loan loanToReturn = loans.stream()
                 .filter(loan -> loan.getReader().equals(reader) && loan.getBook().equals(book) && loan.getReturnDate() == null)
                 .findFirst()

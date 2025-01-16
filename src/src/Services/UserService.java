@@ -1,9 +1,11 @@
 package Services;
 
 import Exceptions.NotFoundException;
+import Exceptions.WriteFileException;
 import Models.Reader;
 import Models.User;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class UserService {
     private List<Reader> readers;
@@ -29,10 +31,9 @@ public class UserService {
         try{
             reader = readers.stream().filter(el -> el.getCardNo().equals(finalCardNo)).findFirst().get();
             return reader;
-        }catch(NullPointerException e){
+        }catch(NoSuchElementException | NullPointerException e){
             throw new NotFoundException("User", finalCardNo);
         }
-
     }
 
     public String getNewCardNo(){
@@ -40,15 +41,10 @@ public class UserService {
         return String.format("%06d", nextNumber);
     }
 
-    public void registerUser(String name) {
+    public void registerUser(String name) throws WriteFileException {
         String CardNo = getNewCardNo();
-        try{
-            Reader reader = new Reader(CardNo, name);
-            readers.add(reader);
-            fileManager.saveUser(reader);
-        }catch(Exception e){
-            System.out.println(e);
-        }
-
+        Reader reader = new Reader(CardNo, name);
+        readers.add(reader);
+        fileManager.saveUser(reader);
     }
 }

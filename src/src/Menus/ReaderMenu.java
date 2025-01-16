@@ -15,7 +15,7 @@ public class ReaderMenu {
     private static Reader currentReader;
     private static InputReader inputReader = new InputReader();
 
-    public void start(LibraryService libraryService) throws LoanException{
+    public void start(LibraryService libraryService) throws WriteFileException, ReadFileException {
         librarian = new Librarian("Admin", libraryService);
         this.libraryService = libraryService;
 
@@ -43,11 +43,10 @@ public class ReaderMenu {
         }
     }
 
-    private static void authenticateReader() throws EmptyStringException, ExitCalledException {
+    private static void authenticateReader() throws WriteFileException, InputException {
         System.out.print("Please enter your card number: ");
         try {
             String cardNo = inputReader.read();
-            Integer.parseInt(cardNo);
             currentReader = librarian.searchUser(cardNo);
             System.out.println("Welcome, " + currentReader.getName() + "!");
 
@@ -57,23 +56,23 @@ public class ReaderMenu {
         } catch (ExitCalledException e) {
             System.out.println(e.getMessage());
             System.exit(0);
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid card number. Please enter a valid number.");
         } catch (NotFoundException e) {
             System.out.println(e.getMessage());
             System.out.println("Registration process");
             registerReader();
+        } catch (InputException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    private static void registerReader() throws EmptyStringException, ExitCalledException {
+    private static void registerReader() throws InputException, WriteFileException {
         System.out.print("Enter your name: ");
         String name = inputReader.read();
         librarian.registerUser(name);
         System.out.println("Registration complete. Welcome, " + name + "!");
     }
 
-    private static void browseLibrary() throws EmptyStringException, ExitCalledException {
+    private static void browseLibrary() throws InputException, NotFoundException {
         System.out.println("You can browse the library without registration.");
         while (true) {
             System.out.print("Enter 'books' to list books, 'find' to search, or 'q' to quit: ");
@@ -86,8 +85,9 @@ public class ReaderMenu {
         }
     }
 
-    private static void userActions() throws EmptyStringException, ExitCalledException, NotFoundException, LoanException {
+    private static void userActions() throws InputException, NotFoundException, WriteFileException {
         while (true) {
+            try {
             System.out.print("Enter a command (type 'help' for options): ");
             String command = inputReader.read().toLowerCase();
             switch (command) {
@@ -96,12 +96,18 @@ public class ReaderMenu {
                 case "find" -> libraryService.searchBooks();
                 case "borrow" -> borrowBook();
                 case "return" -> returnBook();
-                default -> System.out.println("Unknown command.");
+                default -> throw new InvalidCommandException(command);
+                }
+            } catch (InputException e) {
+                System.out.println(e.getMessage());
+                if(e.shouldBreak())System.exit(0);
+            } catch (NotFoundException | LoanException e) {
+                System.out.println(e.getMessage());
             }
         }
     }
 
-    private static void borrowBook() throws EmptyStringException, ExitCalledException, NotFoundException, LoanException {
+    private static void borrowBook() throws InputException, NotFoundException, LoanException, WriteFileException {
 
         List<Book> foundBooks = libraryService.searchBooks();
         Book bookToBorrow = null;
@@ -116,8 +122,6 @@ public class ReaderMenu {
             bookToBorrow = foundBooks.get(0);
         }
         libraryService.borrowBook(currentReader, bookToBorrow);
-
-
     }
 
     private boolean promptYesNo (String message){
@@ -133,7 +137,7 @@ public class ReaderMenu {
             System.out.println("q - to quit");
     }
 
-    private static void returnBook() throws NotFoundException{
+    private static void returnBook() throws NotFoundException, WriteFileException {
         System.out.println("Your borrowed books:");
         List<Loan> userLoans;
 

@@ -1,6 +1,7 @@
 package Services;
 
 import Exceptions.ReadFileException;
+import Exceptions.WriteFileException;
 import Models.Book;
 import Models.Loan;
 import Models.Reader;
@@ -16,7 +17,7 @@ public class FileManager {
     private List<Loan> loans;
     private List<Reader> readers;
 
-    public FileManager() throws ReadFileException {
+    public FileManager() throws ReadFileException, WriteFileException {
         this.books = loadData();
         this.readers = loadUsersData();
         this.loans = loadLoans();
@@ -34,26 +35,27 @@ public class FileManager {
         return loans;
     }
 
-    public void saveData() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("src/src/Files/books.txt"))) {
+    public void saveData() throws WriteFileException {
+        String filePath = "src/src/Files/books.txt";
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             for (Book book : books) {
                 writer.write( book.getId() + "," + book.getTitle() + "," + book.getAuthor() + "," + book.getYear() + "," + book.getAvailableCopies() + "\n");
             }
             System.out.println("Data saved to books.txt");
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new WriteFileException(filePath);
         }
     }
 
     public List<Book> loadData() throws ReadFileException {
         List<Book> books = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader("src/src/Files/books.txt"))) {
+        String filePath = "src/src/Files/books.txt";
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("id")) continue;
 
                 String[] parts = line.split(",");
-                //TODO: wspolna obsluga bledow
                 if (parts.length < 5) {
                     System.out.println("Error in line: " + line);
                     continue;
@@ -80,28 +82,28 @@ public class FileManager {
                 books.add(new Book(id, title, author, year, availableCopies));
             }
         } catch (IOException e) {
-            throw new ReadFileException();
+            throw new ReadFileException(filePath);
         }
         return books;
 
     }
 
-    public void saveUser(Models.Reader reader) {
+    public void saveUser(Models.Reader reader) throws WriteFileException {
         String filePath = "src/src/Files/users.txt";
         String newLine = reader.getCardNo() + "," + reader.getName() + ",reader";
 
         try (FileWriter writer = new FileWriter(filePath, true)) {
             writer.write(newLine + System.lineSeparator());
         } catch (IOException e) {
-            System.out.println("Error while saving user.");
-            e.printStackTrace();
+           throw new WriteFileException(filePath);
         }
     }
 
 
-    public List<Reader> loadUsersData() {
+    public List<Reader> loadUsersData() throws WriteFileException {
         List<Reader> readers = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader("src/src/Files/users.txt"))) {
+        String filePath = "src/src/Files/users.txt";
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("id")) continue;
@@ -114,26 +116,28 @@ public class FileManager {
                 readers.add(new Reader(cardNo, name));
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new WriteFileException(filePath);
         }
         return readers;
 
     }
 
-    public void saveLoans() {
-        try (FileWriter writer = new FileWriter("src/src/Files/loans.txt")) {
+    public void saveLoans() throws WriteFileException {
+        String filePath = "src/src/Files/loans.txt";
+        try (FileWriter writer = new FileWriter(filePath)) {
             for (Loan loan : loans) {
                 writer.write(loan.getReader().getCardNo() + "," + loan.getBook().getId() + "," + loan.getLoanDate() + "," + (loan.getReturnDate() != null ? loan.getReturnDate() : "") + "\n");
             }
             System.out.println("Loans saved to loans.txt");
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new WriteFileException(filePath);
         }
     }
 
-    public List<Loan> loadLoans() {
+    public List<Loan> loadLoans() throws WriteFileException {
         List<Loan> loans = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader("src/src/Files/loans.txt"))) {
+        String filePath = "src/src/Files/loans.txt";
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
@@ -158,7 +162,7 @@ public class FileManager {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+           throw new WriteFileException(filePath);
         }
         return loans;
     }

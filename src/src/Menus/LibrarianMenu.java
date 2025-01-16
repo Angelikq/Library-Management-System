@@ -3,6 +3,7 @@ package Menus;
 import Exceptions.*;
 import Models.*;
 import Services.*;
+import Utils.InputReader;
 
 import java.util.List;
 import java.util.Scanner;
@@ -12,62 +13,70 @@ public class LibrarianMenu {
     private static final Scanner scanner = new Scanner(System.in);
     private LibraryService libraryService;
     private Librarian librarian;
+    private static InputReader inputReader = new InputReader();
 
+    public void start(LibraryService libraryService) throws WriteFileException, ReadFileException {
+        try{
+            this.libraryService = libraryService;
+            this.librarian =new Librarian( "Admin", libraryService);
+            System.out.println("Librarian Menu:");
+            authenticateLibrarian();
+            librarianActions();
+        }catch(AuthenticationFailedException e ){
+            System.out.println(e.getMessage());
+        }
+    }
 
-    public void start(LibraryService libraryService) throws InvalidBookDataException, InvalidCommandException, AuthenticationFailedException, NotFoundException {
-        this.libraryService = libraryService;
-        this.librarian =new Librarian( "Admin", libraryService);
-        System.out.println("Librarian Menu:");
-        if (!authenticateLibrarian()) {
+    private void librarianActions() throws WriteFileException {
+        while (true) {
+            try{
+                System.out.print("Enter a command (type 'help' for options): ");
+                String command = inputReader.read();
+                switch (command) {
+                    case "help" -> printLibrarianHelp();
+                    case "books" -> librarian.listBooks();
+                    case "find" -> librarian.searchBooks();
+                    case "list" -> librarian.listUsers();
+                    case "add" -> addBook();
+                    case "remove" -> removeBook();
+                    case "history" -> displayReaderHistory();
+                    default -> throw new InvalidCommandException(command);
+            }
+        } catch( NotFoundException e){
+                System.out.println(e.getMessage());
+        }catch(InputException e){
+            System.out.println(e.getMessage());
+            if(e.shouldBreak())System.exit(0);
+        }
+        }
+}
+
+    private void authenticateLibrarian() throws AuthenticationFailedException {
+        System.out.print("Enter librarian password: ");
+        boolean isAuthenticationSuccess = scanner.nextLine().equals("admin");
+        if(!isAuthenticationSuccess){
             throw new AuthenticationFailedException();
         }
-        while (true) {
-            System.out.print("Enter a command (type 'help' for options): ");
-            String command = scanner.nextLine().trim().toLowerCase();
-            switch (command) {
-                case "help" -> printLibrarianHelp();
-                case "books" -> librarian.listBooks();
-                case "find" ->  librarian.searchBooks();
-                case "list" -> librarian.listUsers();
-                case "add" -> addBook();
-                case "remove" -> removeBook();
-                case "history" -> displayReaderHistory();
-                case "exit" -> {
-                    System.out.println("Goodbye!");
-                    return;
-                }
-                default -> throw new InvalidCommandException(command);
-            }
-        }
     }
 
-    private boolean authenticateLibrarian() {
-        System.out.print("Enter librarian password: ");
-        return scanner.nextLine().equals("admin");
-    }
-
-    private void addBook() throws InvalidBookDataException{
+    private void addBook() throws InputException, WriteFileException {
         System.out.println("Enter the title of the book: ");
-        scanner.nextLine();
-        String title = scanner.nextLine().trim();
+        String title = inputReader.read();
         System.out.println("Enter the author of the book: ");
-        scanner.nextLine();
-        String author = scanner.nextLine().trim();
+        String author = inputReader.read();
         System.out.println("Enter the publication year of the book: ");
-        scanner.nextLine();
-        int year = Integer.parseInt(scanner.nextLine().trim());
+        int year = inputReader.readNumber();
         System.out.println("Enter the count of available copies of the book: ");
-        scanner.nextLine();
-        int countCopies = Integer.parseInt(scanner.nextLine().trim());
+        int countCopies = inputReader.readNumber();
 
         Book newBook = new Book(UUID.randomUUID(), title,author,year, countCopies);
         librarian.addBook(newBook);
         System.out.println("Book added.");
     }
 
-    private void removeBook() throws NotFoundException {
+    private void removeBook() throws NotFoundException, InputException, WriteFileException {
         System.out.print("Enter book id to remove: ");
-        UUID id = UUID.fromString(scanner.nextLine());
+        UUID id = UUID.fromString(inputReader.read());
         Book bookToRemove = libraryService.getBook(id);
 
         if (bookToRemove != null) {
@@ -83,7 +92,7 @@ public class LibrarianMenu {
         System.out.println("books - display the list of books");
         System.out.println("find - earch for a book");
         System.out.println("remove - remove a book");
-        System.out.println("exit - exit the program");
+        System.out.println("q - to quit");
     }
 
     private void displayReaderHistory() throws NotFoundException {

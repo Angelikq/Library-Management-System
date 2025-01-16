@@ -2,6 +2,7 @@ package Services;
 
 import Exceptions.*;
 import Models.Book;
+import Utils.InputReader;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -10,33 +11,20 @@ public class BookService {
     private static BookService instance;
     private List<Book> books;
     private FileManager fileManager;
+    private InputReader inputReader = new InputReader();
 
     public BookService(List<Book> books, FileManager fileManager) {
         this.fileManager = fileManager;
         this.books = books;
     }
 
-    public void addBook(Book book) throws InvalidBookDataException {
-        if (book.getTitle() == null || book.getTitle().isEmpty()) {
-            throw new InvalidBookDataException("Book title cannot be null or empty.");
-        }
-        if (book.getAuthor() == null || book.getAuthor().isEmpty()) {
-            throw new InvalidBookDataException("Book author cannot be null or empty.");
-        }
-        if (book.getYear() <= 0) {
-            throw new InvalidBookDataException("Book year must be a positive integer.");
-        }
-        if (book.getAvailableCopies() < 0) {
-            throw new InvalidBookDataException("Book available copies cannot be negative.");
-        }
+    public void addBook(Book book) throws  WriteFileException {
         books.add(book);
         fileManager.saveData();
     }
 
-    public void removeBook(Book book) throws NotFoundException {
-        if (!books.remove(book)) {
-            throw new NotFoundException("Book", book.getId().toString());
-        }
+    public void removeBook(Book book) throws WriteFileException {
+        book.deleteStockOfBook();
         fileManager.saveData();
     }
 
@@ -65,10 +53,9 @@ public class BookService {
                 .orElseThrow(() -> new NotFoundException("Book", id.toString()));
     }
 
-    public List<Book> searchBooks() {
+    public List<Book> searchBooks() throws NotFoundException, InputException {
         System.out.print("Enter title, author, or year (min 3 characters): ");
-        Scanner scanner = new Scanner(System.in);
-        String search = scanner.nextLine().trim();
+        String search = inputReader.read();
 
         if (search.length() < 3) {
             System.out.println("Please enter at least 3 characters.");
@@ -90,7 +77,7 @@ public class BookService {
                     book.getYear(),
                     book.getAvailableCopies()));
         } else {
-            System.out.println("No books found matching the criteria.");
+            throw new NotFoundException("Books", search);
         }
         return foundBooks;
     }

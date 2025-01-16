@@ -1,7 +1,8 @@
 package Models;
 
-import Exceptions.InvalidBookDataException;
+import Exceptions.InputException;
 import Exceptions.NotFoundException;
+import Exceptions.WriteFileException;
 import Services.*;
 
 import java.util.List;
@@ -25,11 +26,11 @@ public class Librarian implements User {
         return "Librarian";
     }
 
-    public void addBook(Book book) throws InvalidBookDataException {
+    public void addBook(Book book) throws WriteFileException {
         libraryService.addBook(book);
     }
 
-    public void removeBook(Book book) throws NotFoundException{
+    public void removeBook(Book book) throws NotFoundException, WriteFileException {
         libraryService.removeBook(book);
     }
 
@@ -37,7 +38,7 @@ public class Librarian implements User {
         libraryService.listUsers();
     }
 
-    public List<Book> searchBooks() {
+    public List<Book> searchBooks() throws InputException, NotFoundException {
          return libraryService.searchBooks();
     }
 
@@ -51,5 +52,5 @@ public class Librarian implements User {
         return libraryService.getLoansForReader(reader);
     }
 
-    public void registerUser(String name){libraryService.registerUser(name);};
+    public void registerUser(String name) throws WriteFileException {libraryService.registerUser(name);};
 }
